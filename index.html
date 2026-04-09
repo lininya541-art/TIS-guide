@@ -80,6 +80,7 @@
         }
 
         /* ====== 📱 響應式設計 (手機/平板 RWD) ====== */
+        /* ====== 📱 響應式設計 (手機/平板 RWD) ====== */
         @media (max-width: 768px) {
             .welcome-title { font-size: 2rem; }
             .welcome-subtitle { font-size: 1.4rem; margin-bottom: 25px; }
@@ -89,10 +90,60 @@
             .role-grid { grid-template-columns: 1fr; padding: 10px; }
             .role-grid > div:last-child { width: 100%; }
             
-            /* 手冊主畫面改為上下排列 */
-            #manual-interface { flex-direction: column; }
-            #sidebar { width: 100%; max-height: 40vh; border-bottom: 2px solid #0f172a; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+            /* --- 修正 3 & 4：快速導覽資訊改為「兩兩一排」且文字不截斷 --- */
+            #quick-guide-list {
+                display: grid !important; 
+                grid-template-columns: repeat(2, 1fr); /* 兩欄等寬 */
+                gap: 10px;
+                padding: 0 10px;
+                height: auto !important; /* 解除高度限制，確保能下移檢視 */
+            }
+            #quick-guide-list .btn {
+                width: 100%;
+                height: 100%;
+                min-height: 60px; /* 確保按鈕有基本高度好點擊 */
+                white-space: normal; /* 允許文字自動換行 */
+                padding: 10px;
+                font-size: 0.95rem !important;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-bottom: 0;
+            }
+
+            /* --- 修正 1 & 2：手冊主畫面改為「左側隱藏式側邊欄」 --- */
+            #manual-interface { display: block; } /* 覆蓋原本的 flex */
+            #sidebar { 
+                position: fixed; 
+                top: 0; 
+                left: -100%; /* 預設隱藏於左側畫面外 */
+                width: 80%; 
+                max-width: 300px; 
+                height: 100vh; 
+                max-height: 100vh; 
+                z-index: 9999; 
+                transition: left 0.3s ease; /* 滑入動畫 */
+                overflow-y: auto; /* 確保目錄能獨立完整滑動 */
+                padding-bottom: 80px; /* 底部留白 */
+                border-right: 2px solid #0f172a;
+            }
+            #sidebar.active { left: 0; /* 展開目錄 */ }
             #main-content { padding: 20px 15px; }
+            
+            /* 手機版遮罩層與漢堡按鈕設定 */
+            .sidebar-overlay {
+                display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+                background: rgba(0,0,0,0.6); z-index: 9998;
+            }
+            .sidebar-overlay.active { display: block; }
+            
+            .mobile-menu-btn {
+                display: flex !important; align-items: center; justify-content: center;
+                position: fixed; bottom: 20px; right: 20px;
+                background: #3b82f6; color: white; border: none; border-radius: 50%;
+                width: 60px; height: 60px; font-size: 1.8rem;
+                z-index: 9997; box-shadow: 0 4px 10px rgba(0,0,0,0.3); cursor: pointer;
+            }
             
             /* 文字框與內容縮放 */
             #text-box { padding: 20px; }
@@ -138,6 +189,9 @@
     </div>
 
     <div id="manual-interface" class="interface-container">
+        <button id="mobile-menu-btn" class="mobile-menu-btn" style="display:none;" onclick="toggleMobileSidebar()">☰</button>
+        <div id="mobile-overlay" class="sidebar-overlay" onclick="toggleMobileSidebar()"></div>
+        
         <div id="sidebar">
             <div style="padding: 0 10px 15px 10px; margin-bottom: 15px; border-bottom: 1px solid #334155;">
                 <div style="cursor: pointer; color: #94a3b8; font-weight: bold; margin-bottom: 10px; transition: 0.2s;" onclick="exitManual()" onmouseover="this.style.color='white'" onmouseout="this.style.color='#94a3b8'">⬅ 返回身分引導</div>
@@ -197,6 +251,46 @@
             renderSidebar(); 
             const firstGroup = document.querySelector('.group-btn');
             if(firstGroup) firstGroup.click();
+        }
+
+        // ====== 新增：控制手機版側邊欄開關的函式 ======
+        function toggleMobileSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('mobile-overlay');
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+        }
+
+        // ====== 修改：讓使用者點擊任何「左側目錄項目」後，手機版側邊欄會自動收起 ======
+        function renderTabs(items, btn) {
+            document.querySelectorAll('.group-btn').forEach(b => { b.style.color = '#94a3b8'; b.classList.remove('active'); });
+            btn.style.color = '#60a5fa';
+            btn.classList.add('active');
+            
+            const container = document.getElementById('tab-container');
+            container.innerHTML = '';
+            container.style.display = items.length > 1 ? 'flex' : 'none';
+
+            items.forEach(item => {
+                const t = document.createElement('div');
+                t.className = 'tab-item';
+                t.innerText = item.tabName;
+                t.setAttribute('data-id', item.id);
+                t.onclick = () => {
+                    document.querySelectorAll('.tab-item').forEach(x => x.classList.remove('active'));
+                    t.classList.add('active');
+                    document.getElementById('v-title').innerText = item.tabName;
+                    document.getElementById('v-desc').innerText = item.desc;
+                    updateMedia(item.img);
+                    
+                    // --- 新增這行：如果在手機版，點擊後自動收起目錄 ---
+                    if(window.innerWidth <= 768 && document.getElementById('sidebar').classList.contains('active')) {
+                        toggleMobileSidebar();
+                    }
+                };
+                container.appendChild(t);
+            });
+            if(items.length > 0) container.firstChild.click();
         }
 
         function exitManual() {
