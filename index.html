@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>外來入侵種防治網 - 互動式引導手冊</title>
     <style>
-        :root { --primary: #3b82f6; --bg: #f8fafc; --sidebar-bg: #0f172a; }
+        :root { --primary: #3b82f6; --bg: #f8fafc; --sidebar-bg: #0f172a; font-size: 125%; }
         * { box-sizing: border-box; } 
         body { font-family: 'Microsoft JhengHei', sans-serif; margin: 0; height: 100vh; overflow: hidden; background: var(--bg); }
         
@@ -22,14 +22,19 @@
         .welcome-title { font-size: 2.5rem; color: #1e293b; margin-bottom: 5px; font-weight: bold; }
         .welcome-subtitle { font-size: 2rem; color: #475569; margin-top: 0; margin-bottom: 40px; }
         
+        /* 首頁兩顆按鈕的排版 */
+        .welcome-actions { display: flex; flex-direction: row; gap: 20px; justify-content: center; width: 100%; max-width: 500px; margin: 0 auto; }
+        .welcome-actions .btn { flex: 1; padding: 15px 0; white-space: nowrap; }
+
         .role-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; width: 100%; max-width: 500px; padding: 20px; }
-        .role-grid > div:last-child { grid-column: 1 / -1; justify-self: center; width: calc(50% - 7.5px); }
+        /* 網頁版：確保奇數的最後一個置中且與其他同寬 */
+        .role-grid:not(.role-grid--no-last-span) > div:last-child { grid-column: 1 / -1; justify-self: center; width: calc(50% - 7.5px); }
         
         .role-card { padding: 20px; border-radius: 12px; cursor: pointer; color: white; transition: 0.3s; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); font-size: 1.1rem; font-weight: bold; display: flex; flex-direction: column; justify-content: center; align-items: center; }
         .role-card:hover { transform: translateY(-3px); box-shadow: 0 10px 15px rgba(0,0,0,0.2); filter: brightness(1.1); }
         .role-card small { display: block; margin-top: 5px; opacity: 0.9; font-size: 0.85rem; font-weight: normal; }
         
-        .btn { padding: 15px 40px; border-radius: 30px; border: none; cursor: pointer; font-size: 1.1rem; font-weight: bold; transition: 0.3s; }
+        .btn { padding: 15px 40px; border-radius: 30px; border: none; cursor: pointer; font-size: 1.1rem; font-weight: bold; transition: 0.3s; display: inline-flex; align-items: center; justify-content: center; text-align: center; }
         .btn-primary { background: var(--primary); color: white; box-shadow: 0 4px 10px rgba(59,130,246,0.3); }
         .btn-primary:hover { background: #2563eb; transform: translateY(-2px); }
         .btn-outline { background: white; border: 2px solid var(--primary); color: var(--primary); }
@@ -60,7 +65,7 @@
         #media-container { width: 100%; display: flex; justify-content: center; margin-bottom: 50px; }
         
         #media-wrapper {
-            display: inline-flex; /* 💡 緊密包覆內容的核心！ */
+            display: inline-flex; 
             max-width: 100%; 
             background: white; 
             padding: 5px; 
@@ -70,9 +75,9 @@
         }
 
         .media-content { 
-            width: auto;     /* 💡 讓長寬自然適應 */
+            width: auto;     
             height: auto;
-            max-width: 100%; /* 防超出螢幕 */
+            max-width: 100%; 
             max-height: 55vh; 
             border-radius: 8px;
             clip-path: inset(2px round 8px); 
@@ -80,29 +85,33 @@
         }
 
         /* ====== 📱 響應式設計 (手機/平板 RWD) ====== */
-        /* ====== 📱 響應式設計 (手機/平板 RWD) ====== */
         @media (max-width: 768px) {
             .welcome-title { font-size: 2rem; }
             .welcome-subtitle { font-size: 1.4rem; margin-bottom: 25px; }
-            .btn { padding: 12px 25px; font-size: 1rem; width: 100%; margin-bottom: 10px; }
+            .btn { padding: 12px 25px; font-size: 1rem; margin-bottom: 10px; }
+
+            /* 手機版首頁按鈕排版：改為上下堆疊且等寬 */
+            .welcome-actions { flex-direction: column; width: 100%; max-width: 350px; padding: 0 20px; margin: 0 auto; }
+            .welcome-actions .btn { width: 100%; margin-bottom: 15px; }
             
             /* 身分卡片變單列 */
             .role-grid { grid-template-columns: 1fr; padding: 10px; }
-            .role-grid > div:last-child { width: 100%; }
+            .role-grid > div:last-child { width: 100% !important; justify-self: stretch !important; }
             
-            /* --- 修正 3 & 4：快速導覽資訊改為「兩兩一排」且文字不截斷 --- */
+            /* 快速導覽資訊改為「兩兩一排」 */
             #quick-guide-list {
                 display: grid !important; 
-                grid-template-columns: repeat(2, 1fr); /* 兩欄等寬 */
+                grid-template-columns: repeat(2, 1fr); 
                 gap: 10px;
                 padding: 0 10px;
-                height: auto !important; /* 解除高度限制，確保能下移檢視 */
+                height: auto !important; 
+                margin-bottom: 15px !important; /* 縮小與下方按鈕的間距 */
             }
             #quick-guide-list .btn {
                 width: 100%;
                 height: 100%;
-                min-height: 60px; /* 確保按鈕有基本高度好點擊 */
-                white-space: normal; /* 允許文字自動換行 */
+                min-height: 60px; 
+                white-space: normal; 
                 padding: 10px;
                 font-size: 0.95rem !important;
                 display: flex;
@@ -111,23 +120,37 @@
                 margin-bottom: 0;
             }
 
-            /* --- 修正 1 & 2：手冊主畫面改為「左側隱藏式側邊欄」 --- */
-            #manual-interface { display: block; } /* 覆蓋原本的 flex */
+            /* 💡 修正 1：對齊「查看所有操作手冊」的寬度與高度 */
+            #full-manual-btn {
+                width: calc(100% - 20px) !important; /* 扣除左右各 10px 的間距以對齊上方 Grid */
+                margin: 0 10px !important;           /* 左右保留 10px 邊距 */
+                min-height: 60px;                    /* 與上方按鈕同高 */
+                padding: 10px;
+                font-size: 0.95rem !important;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            /* 💡 修正 2：確保右下角目錄選單在不需要時徹底隱藏 */
+            /* 不要直接用 #manual-interface { display: block; }，這會覆蓋隱藏屬性 */
+            .interface-container.active#manual-interface { display: block; } 
+            
             #sidebar { 
                 position: fixed; 
                 top: 0; 
-                left: -100%; /* 預設隱藏於左側畫面外 */
+                left: -100%; 
                 width: 80%; 
                 max-width: 300px; 
                 height: 100vh; 
                 max-height: 100vh; 
                 z-index: 9999; 
-                transition: left 0.3s ease; /* 滑入動畫 */
-                overflow-y: auto; /* 確保目錄能獨立完整滑動 */
-                padding-bottom: 80px; /* 底部留白 */
+                transition: left 0.3s ease; 
+                overflow-y: auto; 
+                padding-bottom: 80px; 
                 border-right: 2px solid #0f172a;
             }
-            #sidebar.active { left: 0; /* 展開目錄 */ }
+            #sidebar.active { left: 0; }
             #main-content { padding: 20px 15px; }
             
             /* 手機版遮罩層與漢堡按鈕設定 */
@@ -162,7 +185,7 @@
         <div id="page-welcome" class="page active">
             <div class="welcome-title">歡迎使用</div>
             <div class="welcome-subtitle">外來入侵種動物防治通報網</div>
-            <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; padding: 0 20px; width: 100%; max-width: 400px;">
+            <div class="welcome-actions">
                 <button class="btn btn-outline" onclick="window.open('https://fonghs.emct.tw/tis/login')">進入 TIS 網站</button>
                 <button class="btn btn-primary" onclick="showIntroPage('page-roles')">操作手冊</button>
             </div>
@@ -172,7 +195,7 @@
             <div class="back-nav" onclick="showIntroPage('page-welcome')">⬅ 回首頁</div>
             <h2 style="font-size: 1.8rem; margin-bottom: 20px; color: #1e293b;">請選擇您的身分</h2>
             <div class="role-grid">
-                <div class="role-card" style="background:#ef4444" onclick="selectRole('超級管理者')">超級管理者</span><small>[林保署、農試所]</small></div>
+                <div class="role-card" style="background:#ef4444" onclick="selectRole('超級管理者')"><span style="font-size:1.1rem">超級管理者</span><small>[林保署、農試所]</small></div>
                 <div class="role-card" style="background:#eab308" onclick="selectRole('管理者')"><span style="font-size:1.1rem">管理者</span><small>[地方政府]</small></div>
                 <div class="role-card" style="background:#10b981" onclick="selectRole('資料審核者')"><span style="font-size:1.1rem">資料審核者</span><small>[學研單位]</small></div>
                 <div class="role-card" style="background:#3b82f6" onclick="selectRole('點收者')"><span style="font-size:1.1rem">點收者</span><small>[點收廠商]</small></div>
@@ -184,7 +207,7 @@
             <div class="back-nav" onclick="showIntroPage('page-roles')">⬅ 重新選擇身分</div>
             <h2 id="role-title" style="font-size: 1.8rem; margin-bottom: 30px; color: #1e293b;"></h2>
             <div id="quick-guide-list" style="display:flex; flex-wrap:wrap; justify-content:center; gap:15px; max-width:800px; margin-bottom:50px;"></div>
-            <button class="btn btn-primary" onclick="enterFullManual()">查看所有操作手冊</button>
+            <button id="full-manual-btn" class="btn btn-primary" onclick="enterFullManual()">查看所有操作手冊</button>
         </div>
     </div>
 
@@ -217,8 +240,8 @@
     </div>
 
     <script>
-        const nestedData = {"監測圖台": {"首頁": [{"id": "Capture_監測圖台_0_首頁貌.mp4", "img": "Capture_監測圖台_0_首頁貌.mp4", "tabName": "入侵種通報監測與數據導出", "desc": "以地圖呈現外來入侵種動物的通報現況。可依日期及行政區篩選數據，並「CSV 下載」匯出資料。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者", "使用者"]}], "不同檢視模式": [{"id": "Capture_監測圖台_點位.mp4", "img": "Capture_監測圖台_點位.mp4", "tabName": "點位-實際分布位置", "desc": "外來入侵種的點位分布圖，提供地理位置與數據總覽。可透過篩選器和地圖快速掌握物種分佈與防治進度。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者", "使用者"]}, {"id": "Capture_監測圖台_行政區.mp4", "img": "Capture_監測圖台_行政區.mp4", "tabName": "行政區-各區分佈位置", "desc": "外來入侵種的行政區分布圖。透過行政區劃及色彩深淺呈現物種數量熱點，可快速掌握各區域入侵種密度。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者", "使用者"]}, {"id": "Capture_監測圖台_網格.mp4", "img": "Capture_監測圖台_網格.mp4", "tabName": "網格-模糊分布位置", "desc": "外來入侵種的網格分布圖。突破人為劃分的行政區限制，可檢視10 Km×10 Km 的統計數據。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者", "使用者"]}], "篩選": [{"id": "Capture_監測圖台_時間篩選.mp4", "img": "Capture_監測圖台_時間篩選.mp4", "tabName": "篩選時間進行展示", "desc": "可透過日期篩選器設定時間範圍，動態檢視及下載原始資料。點擊「CSV下載」鈕，快速匯出詳細資料進行分析。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者", "使用者"]}, {"id": "Capture_監測圖台_行政區篩選.mp4", "img": "Capture_監測圖台_行政區篩選.mp4", "tabName": "篩選行政區進行展示", "desc": "可透過行政區篩選器設定地理範圍，動態檢視及下載原始資料。點擊「CSV下載」鈕，快速匯出詳細資料進行分析。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者", "使用者"]}], "CSV下載": [{"id": "Capture_監測圖台_CSV下載.mp4", "img": "Capture_監測圖台_CSV下載.mp4", "tabName": "原始資料匯出", "desc": "可依日期及行政區篩選數據，鎖定目標資訊。點擊「CSV下載」匯出數據，以便核對資訊。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者", "使用者"]}], "圖資展示": [{"id": "Capture_監測圖台_變更底圖.mp4", "img": "Capture_監測圖台_變更底圖.mp4", "tabName": "地圖底圖切換管理", "desc": "選擇地圖底圖。點擊「變更底圖」後，選取單一類型再按「確定」即可。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者", "使用者"]}, {"id": "Capture_監測圖台_圖層套疊.mp4", "img": "Capture_監測圖台_圖層套疊.mp4", "tabName": "圖台空間圖資展示", "desc": "設定圖資展示圖層。可從「選擇」勾選複數地理資訊圖層，以利進行資料分析與情勢判讀。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者", "使用者"]}]}, "統計圖表": {"首頁": [{"id": "Capture_統計圖表_0_首頁貌.mp4", "img": "Capture_統計圖表_0_首頁貌.mp4", "tabName": "綠鬣蜥通報趨勢分析", "desc": "提供外來入侵種的統計圖，以柱狀圖呈現顯示過去十二個月的資訊。可透過「篩選」與「圖表下載」或「CSV下載」，分析應用資訊，作為制定防治策略及資源配置的依據。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者"]}], "篩選": [{"id": "Capture_統計圖表_月份篩選.mp4", "img": "Capture_統計圖表_月份篩選.mp4", "tabName": "月份篩選設定", "desc": "透過「篩選」設定統計圖表顯示內容。可選則指定月份，顯示十二個月的統計資料，客製化統計圖表。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者"]}, {"id": "Capture_統計圖表_篩選.mp4", "img": "Capture_統計圖表_篩選.mp4", "tabName": "統計圖表篩選設定", "desc": "透過「篩選」設定統計圖表顯示內容。可選物種性別、行政區及資料集，客製化統計圖表。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者"]}], "不同統計主題": [{"id": "Capture_統計圖表_性別組成變化.mp4", "img": "Capture_統計圖表_性別組成變化.mp4", "tabName": "綠鬣蜥性別組成變化", "desc": "顯示綠鬣蜥十二個月性別組成變化，協助掌握族群動態。可點擊「圖表下載」或「CSV下載」功能，匯出原始資料進行分析與報告。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者"]}, {"id": "Capture_統計圖表_捕捉移除(時間).mp4", "img": "Capture_統計圖表_捕捉移除(時間).mp4", "tabName": "綠鬣蜥捕捉移除(時間)", "desc": "顯示綠鬣蜥十二個月的回報趨勢。可點擊「圖表下載」或「CSV下載」功能，匯出原始資料進行分析與報告。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者"]}, {"id": "Capture_統計圖表_捕捉移除(縣市).mp4", "img": "Capture_統計圖表_捕捉移除(縣市).mp4", "tabName": "綠鬣蜥捕捉移除(縣市)", "desc": "顯示綠鬣蜥十二個月各縣市捕捉移除總量變化。可點擊「圖表下載」或「CSV下載」功能，匯出原始資料進行分析與報告。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者"]}], "資料下載": [{"id": "Capture_統計圖表_圖表下載.mp4", "img": "Capture_統計圖表_圖表下載.mp4", "tabName": "圖表下載", "desc": "可依需求，下載制式圖表。可依月份、性別、行政區、資料集篩選數據，調整顯示資訊。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者"]}, {"id": "Capture_統計圖表_CSV下載.mp4", "img": "Capture_統計圖表_CSV下載.mp4", "tabName": "CSV下載", "desc": "可依需求，迅速自行重繪圖表。可依月份、性別、行政區、資料集篩選數據，匯出資料。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者"]}]}, "調查資料": {"首頁": [{"id": "Capture_調查資料_0_首頁貌.mp4", "img": "Capture_調查資料_0_首頁貌.mp4", "tabName": "數據總覽", "desc": "檢視資料總覽。可透過搜尋與篩選，快速查找特定數據。並可「CSV下載」及「照片下載」，供後續點收、審核、報告、統計使用。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者"]}], "篩選": [{"id": "Capture_調查資料_篩選.mp4", "img": "Capture_調查資料_篩選.mp4", "tabName": "篩選調查資料", "desc": "快速查找特定條件資料。透過「篩選」尋找特定「調查時間」、「點收」狀態、「資料審核」狀態、「隻數」區間、「調查單位」、「調查位置」，並下載CSV。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者"]}], "不同資料集切換": [{"id": "Capture_調查資料_捕捉移除.png", "img": "Capture_調查資料_捕捉移除.png", "tabName": "綠鬣蜥捕捉移除", "desc": "顯示綠鬣蜥捕捉移除的詳細資料。可透過關鍵字搜尋、篩選，並下載CSV或照片進行數據分析與管理。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者"]}, {"id": "Capture_調查資料_通報.png", "img": "Capture_調查資料_通報.png", "tabName": "綠鬣蜥通報", "desc": "顯示綠鬣蜥通報的詳細資料。可透過關鍵字搜尋、篩選，並下載CSV或照片進行數據分析與管理。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者"]}, {"id": "Capture_調查資料_通報-TBN介接.png", "img": "Capture_調查資料_通報-TBN介接.png", "tabName": "綠鬣蜥通報-TBN介接", "desc": "顯示綠鬣蜥通報-TBN介接的詳細資料。可透過關鍵字搜尋、篩選，並下載CSV。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者"]}], "編輯資料": [{"id": "Capture_調查資料_編輯資料.mp4", "img": "Capture_調查資料_編輯資料.mp4", "tabName": "編輯入侵種調查記錄", "desc": "確保資料的正確性。透過點擊「編輯」按鈕，可修改各項資料欄位，例如隻數、性別及吻肛長，確認後點選「更新資料」即可完成變動。", "roles": ["超級管理者", "管理者"]}], "詳細資料": [{"id": "Capture_調查資料_詳細資料.mp4", "img": "Capture_調查資料_詳細資料.mp4", "tabName": "入侵種調查紀錄詳情", "desc": "呈現單筆調查的完整資料與照片。可審閱所有細節，並透過右上角的「編輯」或「封存」按鈕進行管理。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者"]}], "點收": [{"id": "Capture_調查資料_點收.mp4", "img": "Capture_調查資料_點收.mp4", "tabName": "點收調查資料", "desc": "透過「全選」或「勾選特定資料」進行批次點收註記。針對已點收資料再次點擊，即可取消狀態。", "roles": ["管理者", "點收者"]}], "審核": [{"id": "Capture_調查資料_審核.mp4", "img": "Capture_調查資料_審核.mp4", "tabName": "審核調查資料", "desc": "於詳細資料點選「未審核」，再透過「正確」或「錯誤」完成審查。若審核為錯誤，可同步記錄正確資訊。", "roles": ["資料審核者"]}], "封存": [{"id": "Capture_調查資料_封存.mp4", "img": "Capture_調查資料_封存.mp4", "tabName": "封存調查資料", "desc": "將錯誤的資料進行封存。可檢閱已封存的記錄，並進行資料還原，有效管理數據。", "roles": ["超級管理者", "管理者"]}], "資料下載": [{"id": "Capture_調查資料_CSV下載.mp4", "img": "Capture_調查資料_CSV下載.mp4", "tabName": "CSV下載", "desc": "瀏覽與管理調查資料。可依「篩選」，匯出數據，點擊「CSV下載」匯出數據，以後續應用。另外可「編輯」、「封存」資料。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者"]}, {"id": "Capture_調查資料_照片下載.mp4", "img": "Capture_調查資料_照片下載.mp4", "tabName": "照片下載", "desc": "可依需求，下載「原始照片」及帶有「浮水印」的照片。可依「篩選」，鎖定目標資訊，點擊「照片下載」匯出資料，以後續應用。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者"]}]}, "帳號管理": {"首頁": [{"id": "Capture_帳號管理_0_首頁貌.mp4", "img": "Capture_帳號管理_0_首頁貌.mp4", "tabName": "用戶基本資料與狀態總覽", "desc": "進行帳號管理。可以查詢、新增與編輯用戶資訊。", "roles": ["超級管理者", "管理者"]}], "搜尋": [{"id": "Capture_帳號管理_搜尋.mp4", "img": "Capture_帳號管理_搜尋.mp4", "tabName": "搜尋特定帳號", "desc": "透過關鍵字快速搜尋，方便檢視並查詢特定帳號。", "roles": ["超級管理者", "管理者"]}], "單位篩選": [{"id": "Capture_帳號管理_所有單位.mp4", "img": "Capture_帳號管理_所有單位.mp4", "tabName": "篩選相同單位的帳號", "desc": "快速查找特定帳號。透過「單位篩選」尋找目標帳號，並編輯用戶資訊或者重置密碼。", "roles": ["超級管理者", "管理者"]}], "新增帳號": [{"id": "Capture_帳號管理_新增帳號(單筆).mp4", "img": "Capture_帳號管理_新增帳號(單筆).mp4", "tabName": "新增單筆帳號", "desc": "迅速開通帳號。設定新帳號的權限、單位與姓名，並可選擇設定開通與停用日期。填寫後，點擊「新增帳號」建立。", "roles": ["超級管理者", "管理者"]}, {"id": "Capture_帳號管理_新增帳號(多筆).mp4", "img": "Capture_帳號管理_新增帳號(多筆).mp4", "tabName": "新增多筆帳號", "desc": "可以一次新增多筆帳號，設定其權限、所屬單位及名稱。支援上傳帳號名單，並可彈性設定開通與停用時間。", "roles": ["超級管理者", "管理者"]}], "編輯帳號": [{"id": "Capture_帳號管理_編輯帳號.mp4", "img": "Capture_帳號管理_編輯帳號.mp4", "tabName": "編輯帳號", "desc": "針對錯誤或者需要編輯的帳號做設定。透過「┇」可以編輯帳號權限、單位、開通/停用時間。", "roles": ["超級管理者", "管理者"]}], "忘記密碼": [{"id": "Capture_帳號管理_忘記密碼.mp4", "img": "Capture_帳號管理_忘記密碼.mp4", "tabName": "忘記密碼", "desc": "點選「重置密碼」並「下載帳號卡」給用戶，用戶可憑臨時密碼登入並修改密碼。", "roles": ["超級管理者", "管理者"]}]}, "物種管理": {"首頁": [{"id": "Capture_物種管理_0_首頁貌.mp4", "img": "Capture_物種管理_0_首頁貌.mp4", "tabName": "總覽與維護", "desc": "檢視並維護所有外來入侵種列表。可搜尋特定物種、新增資料或啟用/停用資料庫狀態。", "roles": ["超級管理者"]}], "搜尋": [{"id": "Capture_物種管理_搜尋.mp4", "img": "Capture_物種管理_搜尋.mp4", "tabName": "搜尋物種資料庫", "desc": "透過關鍵字快速搜尋，方便檢視並查詢物種資料庫。", "roles": ["超級管理者"]}], "啟用/停用": [{"id": "Capture_物種管理_停用.mp4", "img": "Capture_物種管理_停用.mp4", "tabName": "蒐集與顯示資料管理", "desc": "確保平台資料的即時性與準確性。透過「┇」可以編輯物種名稱、啟用/停用資料集。", "roles": ["超級管理者"]}], "新增物種": [{"id": "Capture_物種管理_新增物種.mp4", "img": "Capture_物種管理_新增物種.mp4", "tabName": "系統物種名錄管理", "desc": "維護外來入侵種名錄。點擊右上方「+ 新增物種」按鈕，可新增物種名稱至資料庫。", "roles": ["超級管理者"]}], "資料集": [{"id": "Capture_物種管理_帶入既有資料集.mp4", "img": "Capture_物種管理_帶入既有資料集.mp4", "tabName": "帶入既有資料集", "desc": "迅速複製既有資料集的題目設定。可為新資料集命名、選擇既有物種及欲導入資料集，並設定填寫與管理權限。完成後，點擊「新增」建立。", "roles": ["超級管理者"]}, {"id": "Capture_物種管理_新增資料集.mp4", "img": "Capture_物種管理_新增資料集.mp4", "tabName": "新增資料集", "desc": "建立新物種資料集與權限配置。輸入資料集名稱，完成後，點擊「新增」、並完成新增題目，點擊「啟用」，即可開始蒐集資料。", "roles": ["超級管理者"]}], "題目": [{"id": "Capture_物種管理_新增題目.mp4", "img": "Capture_物種管理_新增題目.mp4", "tabName": "新增題目", "desc": "提供「文字輸入」、「選擇題」、「日期」、「上傳照片」，並支援題目標題、題目提示語、補充說明文字及必選填設定。", "roles": ["超級管理者"]}, {"id": "Capture_物種管理_編輯題目.mp4", "img": "Capture_物種管理_編輯題目.mp4", "tabName": "編輯題目", "desc": "支援編輯題目內容與必選填設定，並可透過「⌃」、「⌄」調整題目順序。", "roles": ["超級管理者"]}, {"id": "Capture_物種管理_封存題目.mp4", "img": "Capture_物種管理_封存題目.mp4", "tabName": "封存題目", "desc": "點選「封存」可於App 隱藏題目並停止資料蒐集；如需恢復，再次點擊即可「解除封存」。", "roles": ["超級管理者"]}]}};
-        const quickGuideData = {"超級管理者": [{"id": "Capture_監測圖台_時間篩選.mp4", "label": "看特定資料"}, {"id": "Capture_監測圖台_CSV下載.mp4", "label": "下載核對資料"}, {"id": "Capture_監測圖台_圖層套疊.mp4", "label": "看地景分布"}, {"id": "Capture_統計圖表_性別組成變化.mp4", "label": "看月匯報"}, {"id": "Capture_調查資料_編輯資料.mp4", "label": "修正資料"}, {"id": "Capture_調查資料_CSV下載.mp4", "label": "需要匯報-CSV"}, {"id": "Capture_調查資料_照片下載.mp4", "label": "需要匯報-照片"}, {"id": "Capture_帳號管理_新增帳號(單筆).mp4", "label": "新增帳號"}, {"id": "Capture_物種管理_新增物種.mp4", "label": "紀錄更多入侵動物"}], "管理者": [{"id": "Capture_監測圖台_時間篩選.mp4", "label": "看特定資料"}, {"id": "Capture_監測圖台_CSV下載.mp4", "label": "下載核對資料"}, {"id": "Capture_監測圖台_圖層套疊.mp4", "label": "看地景分布"}, {"id": "Capture_統計圖表_性別組成變化.mp4", "label": "看月匯報"}, {"id": "Capture_調查資料_編輯資料.mp4", "label": "修正資料"}, {"id": "Capture_調查資料_點收.mp4", "label": "點收資料"}, {"id": "Capture_調查資料_CSV下載.mp4", "label": "需要匯報-CSV"}, {"id": "Capture_調查資料_照片下載.mp4", "label": "需要匯報-照片"}, {"id": "Capture_帳號管理_新增帳號(單筆).mp4", "label": "新增帳號"}], "資料審核者": [{"id": "Capture_監測圖台_時間篩選.mp4", "label": "看特定資料"}, {"id": "Capture_監測圖台_CSV下載.mp4", "label": "下載核對資料"}, {"id": "Capture_監測圖台_圖層套疊.mp4", "label": "看地景分布"}, {"id": "Capture_統計圖表_性別組成變化.mp4", "label": "看月匯報"}, {"id": "Capture_調查資料_審核.mp4", "label": "審核資料"}, {"id": "Capture_調查資料_CSV下載.mp4", "label": "需要匯報-CSV"}, {"id": "Capture_調查資料_照片下載.mp4", "label": "需要匯報-照片"}], "點收者": [{"id": "Capture_監測圖台_時間篩選.mp4", "label": "看特定資料"}, {"id": "Capture_監測圖台_CSV下載.mp4", "label": "下載核對資料"}, {"id": "Capture_監測圖台_圖層套疊.mp4", "label": "看地景分布"}, {"id": "Capture_統計圖表_性別組成變化.mp4", "label": "看月匯報"}, {"id": "Capture_調查資料_點收.mp4", "label": "點收資料"}, {"id": "Capture_調查資料_CSV下載.mp4", "label": "需要匯報-CSV"}, {"id": "Capture_調查資料_照片下載.mp4", "label": "需要匯報-照片"}], "使用者": [{"id": "Capture_監測圖台_時間篩選.mp4", "label": "看特定資料"}, {"id": "Capture_監測圖台_CSV下載.mp4", "label": "下載核對資料"}, {"id": "Capture_監測圖台_圖層套疊.mp4", "label": "看地景分布"}]};
+        const nestedData = {"監測圖台": {"首頁": [{"id": "Capture_監測圖台_0_首頁貌.mp4", "img": "Capture_監測圖台_0_首頁貌.mp4", "tabName": "入侵種通報監測與數據導出", "desc": "以地圖呈現外來入侵種動物的通報現況。可依日期及行政區篩選數據，並「CSV 下載」匯出資料。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者", "使用者"]}], "不同檢視模式": [{"id": "Capture_監測圖台_點位.mp4", "img": "Capture_監測圖台_點位.mp4", "tabName": "點位-實際分布位置", "desc": "外來入侵種的點位分布圖，提供地理位置與數據總覽。可透過篩選器和地圖快速掌握物種分佈與防治進度。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者", "使用者"]}, {"id": "Capture_監測圖台_行政區.mp4", "img": "Capture_監測圖台_行政區.mp4", "tabName": "行政區-各區分佈位置", "desc": "外來入侵種的行政區分布圖。透過行政區劃及色彩深淺呈現物種數量熱點，可快速掌握各區域入侵種密度。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者", "使用者"]}, {"id": "Capture_監測圖台_網格.mp4", "img": "Capture_監測圖台_網格.mp4", "tabName": "網格-模糊分布位置", "desc": "外來入侵種的網格分布圖。突破人為劃分的行政區限制，可檢視10 Km×10 Km 的統計數據。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者", "使用者"]}], "篩選": [{"id": "Capture_監測圖台_時間篩選.mp4", "img": "Capture_監測圖台_時間篩選.mp4", "tabName": "篩選時間進行展示", "desc": "可透過日期篩選器設定時間範圍，動態檢視及下載原始資料。點擊「CSV下載」鈕，快速匯出詳細資料進行分析。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者", "使用者"]}, {"id": "Capture_監測圖台_行政區篩選.mp4", "img": "Capture_監測圖台_行政區篩選.mp4", "tabName": "篩選行政區進行展示", "desc": "可透過行政區篩選器設定地理範圍，動態檢視及下載原始資料。點擊「CSV下載」鈕，快速匯出詳細資料進行分析。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者", "使用者"]}], "CSV下載": [{"id": "Capture_監測圖台_CSV下載.mp4", "img": "Capture_監測圖台_CSV下載.mp4", "tabName": "原始資料匯出", "desc": "可依日期及行政區篩選數據，鎖定目標資訊。點擊「CSV下載」匯出數據，以便核對資訊。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者", "使用者"]}], "圖資展示": [{"id": "Capture_監測圖台_變更底圖.mp4", "img": "Capture_監測圖台_變更底圖.mp4", "tabName": "地圖底圖切換管理", "desc": "選擇地圖底圖。點擊「變更底圖」後，選取單一類型再按「確定」即可。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者", "使用者"]}, {"id": "Capture_監測圖台_圖層套疊.mp4", "img": "Capture_監測圖台_圖層套疊.mp4", "tabName": "圖台空間圖資展示", "desc": "設定圖資展示圖層。可從「選擇」勾選複數地理資訊圖層，以利進行資料分析與情勢判讀。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者", "使用者"]}]}, "統計圖表": {"首頁": [{"id": "Capture_統計圖表_0_首頁貌.mp4", "img": "Capture_統計圖表_0_首頁貌.mp4", "tabName": "綠鬣蜥通報趨勢分析", "desc": "提供外來入侵種的統計圖，以柱狀圖呈現顯示過去十二個月的資訊。可透過「篩選」與「圖表下載」或「CSV下載」，分析應用資訊，作為制定防治策略及資源配置的依據。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者"]}], "篩選": [{"id": "Capture_統計圖表_月份篩選.mp4", "img": "Capture_統計圖表_月份篩選.mp4", "tabName": "月份篩選設定", "desc": "透過「篩選」設定統計圖表顯示內容。可選擇指定月份，顯示十二個月的統計資料，客製化統計圖表。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者"]}, {"id": "Capture_統計圖表_篩選.mp4", "img": "Capture_統計圖表_篩選.mp4", "tabName": "統計圖表篩選設定", "desc": "透過「篩選」設定統計圖表顯示內容。可選物種性別、行政區及資料集，客製化統計圖表。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者"]}], "不同統計主題": [{"id": "Capture_統計圖表_性別組成變化.mp4", "img": "Capture_統計圖表_性別組成變化.mp4", "tabName": "綠鬣蜥性別組成變化", "desc": "顯示綠鬣蜥十二個月性別組成變化，協助掌握族群動態。可點擊「圖表下載」或「CSV下載」功能，匯出原始資料進行分析與報告。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者"]}, {"id": "Capture_統計圖表_捕捉移除(時間).mp4", "img": "Capture_統計圖表_捕捉移除(時間).mp4", "tabName": "綠鬣蜥捕捉移除(時間)", "desc": "顯示綠鬣蜥十二個月的回報趨勢。可點擊「圖表下載」或「CSV下載」功能，匯出原始資料進行分析與報告。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者"]}, {"id": "Capture_統計圖表_捕捉移除(縣市).mp4", "img": "Capture_統計圖表_捕捉移除(縣市).mp4", "tabName": "綠鬣蜥捕捉移除(縣市)", "desc": "顯示綠鬣蜥十二個月各縣市捕捉移除總量變化。可點擊「圖表下載」或「CSV下載」功能，匯出原始資料進行分析與報告。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者"]}], "資料下載": [{"id": "Capture_統計圖表_圖表下載.mp4", "img": "Capture_統計圖表_圖表下載.mp4", "tabName": "圖表下載", "desc": "可依需求，下載制式圖表。可依月份、性別、行政區、資料集篩選數據，調整顯示資訊。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者"]}, {"id": "Capture_統計圖表_CSV下載.mp4", "img": "Capture_統計圖表_CSV下載.mp4", "tabName": "CSV下載", "desc": "可依需求，迅速自行重繪圖表。可依月份、性別、行政區、資料集篩選數據，匯出資料。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者"]}]}, "調查資料": {"首頁": [{"id": "Capture_調查資料_0_首頁貌.mp4", "img": "Capture_調查資料_0_首頁貌.mp4", "tabName": "數據總覽", "desc": "檢視資料總覽。可透過搜尋與篩選，快速查找特定數據。並可「CSV下載」及「照片下載」，供後續點收、審核、報告、統計使用。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者"]}], "篩選": [{"id": "Capture_調查資料_篩選.mp4", "img": "Capture_調查資料_篩選.mp4", "tabName": "篩選調查資料", "desc": "快速查找特定條件資料。透過「篩選」尋找特定「調查時間」、「點收」狀態、「資料審核」狀態、「隻數」區間、「調查單位」、「調查位置」，並下載CSV。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者"]}], "不同資料集切換": [{"id": "Capture_調查資料_捕捉移除.png", "img": "Capture_調查資料_捕捉移除.png", "tabName": "綠鬣蜥捕捉移除", "desc": "顯示綠鬣蜥捕捉移除的詳細資料。可透過關鍵字搜尋、篩選，並下載CSV或照片進行數據分析與管理。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者"]}, {"id": "Capture_調查資料_通報.png", "img": "Capture_調查資料_通報.png", "tabName": "綠鬣蜥通報", "desc": "顯示綠鬣蜥通報的詳細資料。可透過關鍵字搜尋、篩選，並下載CSV或照片進行數據分析與管理。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者"]}, {"id": "Capture_調查資料_通報-TBN介接.png", "img": "Capture_調查資料_通報-TBN介接.png", "tabName": "綠鬣蜥通報-TBN介接", "desc": "顯示綠鬣蜥通報-TBN介接的詳細資料。可透過關鍵字搜尋、篩選，並下載CSV。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者"]}], "編輯資料": [{"id": "Capture_調查資料_編輯資料.mp4", "img": "Capture_調查資料_編輯資料.mp4", "tabName": "編輯入侵種調查記錄", "desc": "確保資料的正確性。透過點擊「編輯」按鈕，可修改資料欄位，包含：隻數、性別及吻肛長，確認後點選「更新資料」即可完成變動。", "roles": ["超級管理者", "管理者"]}], "詳細資料": [{"id": "Capture_調查資料_詳細資料.mp4", "img": "Capture_調查資料_詳細資料.mp4", "tabName": "入侵種調查紀錄詳情", "desc": "呈現單筆調查的完整資料與照片。可審閱所有細節，並透過右上角的「編輯」或「封存」按鈕進行管理。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者"]}], "點收": [{"id": "Capture_調查資料_點收.mp4", "img": "Capture_調查資料_點收.mp4", "tabName": "點收調查資料", "desc": "透過「全選」或「勾選特定資料」進行批次點收註記。針對已點收資料再次點擊，即可取消狀態。", "roles": ["管理者", "點收者"]}], "審核": [{"id": "Capture_調查資料_審核.mp4", "img": "Capture_調查資料_審核.mp4", "tabName": "審核調查資料", "desc": "於詳細資料點選「未審核」，再透過「正確」或「錯誤」完成審查。若審核為錯誤，可同步記錄正確資訊。", "roles": ["資料審核者"]}], "封存": [{"id": "Capture_調查資料_封存.mp4", "img": "Capture_調查資料_封存.mp4", "tabName": "封存調查資料", "desc": "將錯誤的資料進行封存。可檢閱已封存的記錄，並進行資料還原，有效管理數據。", "roles": ["超級管理者", "管理者"]}], "資料下載": [{"id": "Capture_調查資料_CSV下載.mp4", "img": "Capture_調查資料_CSV下載.mp4", "tabName": "CSV下載", "desc": "瀏覽與管理調查資料。可依「篩選」，匯出數據，點擊「CSV下載」匯出數據，以後續應用。另外可「編輯」、「封存」資料。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者"]}, {"id": "Capture_調查資料_照片下載.mp4", "img": "Capture_調查資料_照片下載.mp4", "tabName": "照片下載", "desc": "可依需求，下載「原始照片」及帶有「浮水印」的照片。可依「篩選」，鎖定目標資訊，點擊「照片下載」匯出資料，以後續應用。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者"]}]}, "帳號管理": {"首頁": [{"id": "Capture_帳號管理_0_首頁貌.mp4", "img": "Capture_帳號管理_0_首頁貌.mp4", "tabName": "用戶基本資料與狀態總覽", "desc": "進行帳號管理。可以搜尋、篩選、新增與編輯用戶資訊。", "roles": ["超級管理者", "管理者"]}], "搜尋": [{"id": "Capture_帳號管理_搜尋.mp4", "img": "Capture_帳號管理_搜尋.mp4", "tabName": "搜尋特定帳號", "desc": "透過關鍵字快速搜尋，方便檢視並查詢特定帳號。", "roles": ["超級管理者", "管理者"]}], "單位篩選": [{"id": "Capture_帳號管理_所有單位.mp4", "img": "Capture_帳號管理_所有單位.mp4", "tabName": "篩選相同單位的帳號", "desc": "快速查找特定帳號。透過「單位篩選」尋找目標帳號，並可以結合「勾選」進行批次開通、停用或下載帳號卡。", "roles": ["超級管理者", "管理者"]}], "新增帳號": [{"id": "Capture_帳號管理_新增帳號(單筆).mp4", "img": "Capture_帳號管理_新增帳號(單筆).mp4", "tabName": "新增單筆帳號", "desc": "迅速開通帳號。設定新帳號的權限、單位與姓名，並可選擇設定開通與停用日期。填寫後，點擊「新增帳號」建立。", "roles": ["超級管理者", "管理者"]}, {"id": "Capture_帳號管理_新增帳號(多筆).mp4", "img": "Capture_帳號管理_新增帳號(多筆).mp4", "tabName": "新增多筆帳號", "desc": "可以一次新增多筆帳號，設定其權限、所屬單位及名稱。支援上傳帳號名單，並可彈性設定開通與停用時間。", "roles": ["超級管理者", "管理者"]}], "編輯帳號": [{"id": "Capture_帳號管理_編輯帳號.mp4", "img": "Capture_帳號管理_編輯帳號.mp4", "tabName": "編輯帳號", "desc": "針對錯誤或者需要編輯的帳號做設定。透過「┇」可以編輯帳號權限、單位、開通/停用時間。", "roles": ["超級管理者", "管理者"]}], "忘記密碼": [{"id": "Capture_帳號管理_忘記密碼.mp4", "img": "Capture_帳號管理_忘記密碼.mp4", "tabName": "忘記密碼", "desc": "點選「重置密碼」並「下載帳號卡」給用戶，用戶可憑臨時密碼登入並修改密碼。", "roles": ["超級管理者", "管理者"]}], "勾選": [{"id": "Capture_帳號管理_勾選.mp4", "img": "Capture_帳號管理_勾選.mp4", "tabName": "勾選", "desc": "透過「全選」或「勾選特定資料」進行開通、停用或下載帳號卡。針對已勾選帳號再次點擊，即可取消狀態。", "roles": ["超級管理者", "管理者"]}]}, "物種管理": {"首頁": [{"id": "Capture_物種管理_0_首頁貌.mp4", "img": "Capture_物種管理_0_首頁貌.mp4", "tabName": "總覽與維護", "desc": "檢視並維護所有外來入侵種列表。可搜尋特定物種、新增資料或啟用/停用資料庫狀態。", "roles": ["超級管理者"]}], "搜尋": [{"id": "Capture_物種管理_搜尋.mp4", "img": "Capture_物種管理_搜尋.mp4", "tabName": "搜尋物種資料庫", "desc": "透過關鍵字快速搜尋，方便檢視並查詢物種資料庫。", "roles": ["超級管理者"]}], "啟用/停用": [{"id": "Capture_物種管理_停用.mp4", "img": "Capture_物種管理_停用.mp4", "tabName": "蒐集與顯示資料管理", "desc": "確保平台資料的即時性與準確性。透過「┇」可以編輯物種名稱、啟用/停用資料集。停用資料集後，App 不再蒐集資料、且網頁版監測圖台不顯示資訊。", "roles": ["超級管理者"]}], "新增物種": [{"id": "Capture_物種管理_新增物種.mp4", "img": "Capture_物種管理_新增物種.mp4", "tabName": "系統物種名錄管理", "desc": "維護外來入侵種名錄。點擊右上方「+ 新增物種」按鈕，可新增物種名稱至資料庫。", "roles": ["超級管理者"]}], "資料集": [{"id": "Capture_物種管理_帶入既有資料集.mp4", "img": "Capture_物種管理_帶入既有資料集.mp4", "tabName": "帶入既有資料集", "desc": "迅速複製既有資料集的題目設定。可為新資料集命名、選擇既有物種及欲導入資料集，並設定填寫與管理權限。完成後，點擊「新增」建立。", "roles": ["超級管理者"]}, {"id": "Capture_物種管理_新增資料集.mp4", "img": "Capture_物種管理_新增資料集.mp4", "tabName": "新增資料集", "desc": "建立新物種資料集與權限配置。輸入資料集名稱，完成後，點擊「新增」、並完成新增題目，點擊「啟用」，即可開始蒐集資料。", "roles": ["超級管理者"]}], "題目": [{"id": "Capture_物種管理_新增題目.mp4", "img": "Capture_物種管理_新增題目.mp4", "tabName": "新增題目", "desc": "提供「文字輸入」、「選擇題」、「日期」、「上傳照片」，並支援題目標題、題目提示語、補充說明文字及必選填設定。", "roles": ["超級管理者"]}, {"id": "Capture_物種管理_編輯題目.mp4", "img": "Capture_物種管理_編輯題目.mp4", "tabName": "編輯題目", "desc": "支援編輯題目內容與必選填設定，並可透過「⌃」、「⌄」調整題目順序。", "roles": ["超級管理者"]}, {"id": "Capture_物種管理_封存題目.mp4", "img": "Capture_物種管理_封存題目.mp4", "tabName": "封存題目", "desc": "點選「封存」可於App 隱藏題目並停止資料蒐集；如需恢復，再次點擊即可「解除封存」。", "roles": ["超級管理者"]}]}, "App指南": {"下載與客服": [{"id": "F.png", "img": "F.png", "tabName": "App 下載及Line 客服", "desc": "通過掃描QR Code 下載App 或加入Line 客服開始提問。", "roles": ["使用者"]}, {"id": "App 下載.png", "img": "App 下載.png", "tabName": "App 下載 QR Code", "desc": "請掃描QR Code 下載App。", "roles": ["使用者"]}, {"id": "客服諮詢管道.png", "img": "客服諮詢管道.png", "tabName": "Line 客服 QR Code", "desc": "請掃描QR Code 加入Line 客服開始提問。", "roles": ["使用者"]}], "教學": [{"id": "B.png", "img": "B.png", "tabName": "App 操作教學", "desc": "提供拍照時的注意事項及逐步教學，可通過掃描下方QR code 觀看教學影片。", "roles": ["使用者"]}, {"id": "操作影片.png", "img": "操作影片.png", "tabName": "影片教學", "desc": "請掃描操作影片QR code 觀看教學步驟。", "roles": ["使用者"]}]}};
+        const quickGuideData = {"超級管理者": [{"id": "Capture_監測圖台_時間篩選.mp4", "label": "看特定資料"}, {"id": "Capture_監測圖台_CSV下載.mp4", "label": "下載核對資料"}, {"id": "Capture_監測圖台_圖層套疊.mp4", "label": "看地景分布"}, {"id": "Capture_統計圖表_性別組成變化.mp4", "label": "看月匯報"}, {"id": "Capture_調查資料_編輯資料.mp4", "label": "修正資料"}, {"id": "Capture_調查資料_CSV下載.mp4", "label": "需要匯報-CSV"}, {"id": "Capture_調查資料_照片下載.mp4", "label": "需要匯報-照片"}, {"id": "Capture_帳號管理_新增帳號(單筆).mp4", "label": "新增帳號"}, {"id": "Capture_物種管理_新增物種.mp4", "label": "紀錄更多入侵動物"}], "管理者": [{"id": "Capture_監測圖台_時間篩選.mp4", "label": "看特定資料"}, {"id": "Capture_監測圖台_CSV下載.mp4", "label": "下載核對資料"}, {"id": "Capture_監測圖台_圖層套疊.mp4", "label": "看地景分布"}, {"id": "Capture_統計圖表_性別組成變化.mp4", "label": "看月匯報"}, {"id": "Capture_調查資料_編輯資料.mp4", "label": "修正資料"}, {"id": "Capture_調查資料_點收.mp4", "label": "點收資料"}, {"id": "Capture_調查資料_CSV下載.mp4", "label": "需要匯報-CSV"}, {"id": "Capture_調查資料_照片下載.mp4", "label": "需要匯報-照片"}, {"id": "Capture_帳號管理_新增帳號(單筆).mp4", "label": "新增帳號"}], "資料審核者": [{"id": "Capture_監測圖台_時間篩選.mp4", "label": "看特定資料"}, {"id": "Capture_監測圖台_CSV下載.mp4", "label": "下載核對資料"}, {"id": "Capture_監測圖台_圖層套疊.mp4", "label": "看地景分布"}, {"id": "Capture_統計圖表_性別組成變化.mp4", "label": "看月匯報"}, {"id": "Capture_調查資料_審核.mp4", "label": "審核資料"}, {"id": "Capture_調查資料_CSV下載.mp4", "label": "需要匯報-CSV"}, {"id": "Capture_調查資料_照片下載.mp4", "label": "需要匯報-照片"}], "點收者": [{"id": "Capture_監測圖台_時間篩選.mp4", "label": "看特定資料"}, {"id": "Capture_監測圖台_CSV下載.mp4", "label": "下載核對資料"}, {"id": "Capture_監測圖台_圖層套疊.mp4", "label": "看地景分布"}, {"id": "Capture_統計圖表_性別組成變化.mp4", "label": "看月匯報"}, {"id": "Capture_調查資料_點收.mp4", "label": "點收資料"}, {"id": "Capture_調查資料_CSV下載.mp4", "label": "需要匯報-CSV"}, {"id": "Capture_調查資料_照片下載.mp4", "label": "需要匯報-照片"}], "使用者": [{"id": "Capture_監測圖台_時間篩選.mp4", "label": "看特定資料"}, {"id": "Capture_監測圖台_CSV下載.mp4", "label": "下載核對資料"}, {"id": "Capture_監測圖台_圖層套疊.mp4", "label": "看地景分布"}, {"id": "B.png", "label": "App 教學"}]};
         let currentRole = "";
 
         function showIntroPage(pageId) {
@@ -253,44 +276,11 @@
             if(firstGroup) firstGroup.click();
         }
 
-        // ====== 新增：控制手機版側邊欄開關的函式 ======
         function toggleMobileSidebar() {
             const sidebar = document.getElementById('sidebar');
             const overlay = document.getElementById('mobile-overlay');
             sidebar.classList.toggle('active');
             overlay.classList.toggle('active');
-        }
-
-        // ====== 修改：讓使用者點擊任何「左側目錄項目」後，手機版側邊欄會自動收起 ======
-        function renderTabs(items, btn) {
-            document.querySelectorAll('.group-btn').forEach(b => { b.style.color = '#94a3b8'; b.classList.remove('active'); });
-            btn.style.color = '#60a5fa';
-            btn.classList.add('active');
-            
-            const container = document.getElementById('tab-container');
-            container.innerHTML = '';
-            container.style.display = items.length > 1 ? 'flex' : 'none';
-
-            items.forEach(item => {
-                const t = document.createElement('div');
-                t.className = 'tab-item';
-                t.innerText = item.tabName;
-                t.setAttribute('data-id', item.id);
-                t.onclick = () => {
-                    document.querySelectorAll('.tab-item').forEach(x => x.classList.remove('active'));
-                    t.classList.add('active');
-                    document.getElementById('v-title').innerText = item.tabName;
-                    document.getElementById('v-desc').innerText = item.desc;
-                    updateMedia(item.img);
-                    
-                    // --- 新增這行：如果在手機版，點擊後自動收起目錄 ---
-                    if(window.innerWidth <= 768 && document.getElementById('sidebar').classList.contains('active')) {
-                        toggleMobileSidebar();
-                    }
-                };
-                container.appendChild(t);
-            });
-            if(items.length > 0) container.firstChild.click();
         }
 
         function exitManual() {
@@ -377,6 +367,10 @@
                     document.getElementById('v-title').innerText = item.tabName;
                     document.getElementById('v-desc').innerText = item.desc;
                     updateMedia(item.img);
+                    
+                    if(window.innerWidth <= 768 && document.getElementById('sidebar').classList.contains('active')) {
+                        toggleMobileSidebar();
+                    }
                 };
                 container.appendChild(t);
             });
