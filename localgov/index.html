@@ -7,27 +7,30 @@
     <style>
         :root { --primary: #3b82f6; --bg: #f8fafc; --sidebar-bg: #0f172a; font-size: 125%; }
         * { box-sizing: border-box; } 
-        body { font-family: 'Microsoft JhengHei', sans-serif; margin: 0; height: 100vh; overflow: hidden; background: var(--bg); }
+        /* 💡 修正 1：改用 100dvh (動態視窗高度) 解決手機瀏覽器網址列遮擋問題 */
+        body { font-family: 'Microsoft JhengHei', sans-serif; margin: 0; height: 100dvh; overflow: hidden; background: var(--bg); }
         
-        /* 根容器區隔 */
-        .interface-container { width: 100%; height: 100%; display: none; }
+        .interface-container { width: 100%; height: 100dvh; display: none; overflow: hidden; }
         .interface-container.active { display: flex; }
 
         /* ====== 歡迎頁 & 身分選擇頁 ====== */
         #intro-interface { flex-direction: column; align-items: center; justify-content: center; position: relative; }
-        .page { display: none; flex-direction: column; align-items: center; justify-content: center; width: 100%; animation: fadeIn 0.4s; text-align: center; }
+        
+        /* 💡 修正 2：確保獨立頁面 (如身分選擇、快速導覽) 內容過長時可以滑動 */
+        .page { 
+            display: none; flex-direction: column; align-items: center; justify-content: flex-start; 
+            width: 100%; height: 100dvh; overflow-y: auto; padding: 80px 20px 40px 20px; animation: fadeIn 0.4s; text-align: center; 
+        }
         .page.active { display: flex; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .welcome-title { font-size: 2.5rem; color: #1e293b; margin-bottom: 5px; font-weight: bold; }
+        .welcome-title { font-size: 2.5rem; color: #1e293b; margin-bottom: 5px; font-weight: bold; margin-top: auto; }
         .welcome-subtitle { font-size: 2rem; color: #475569; margin-top: 0; margin-bottom: 40px; }
         
-        /* 首頁兩顆按鈕的排版 */
-        .welcome-actions { display: flex; flex-direction: row; gap: 20px; justify-content: center; width: 100%; max-width: 500px; margin: 0 auto; }
+        .welcome-actions { display: flex; flex-direction: row; gap: 20px; justify-content: center; width: 100%; max-width: 500px; margin: 0 auto auto auto; }
         .welcome-actions .btn { flex: 1; padding: 15px 0; white-space: nowrap; }
 
-        .role-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; width: 100%; max-width: 500px; padding: 20px; }
-        /* 網頁版：確保奇數的最後一個置中且與其他同寬 */
+        .role-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; width: 100%; max-width: 500px; padding: 20px; margin: auto; }
         .role-grid:not(.role-grid--no-last-span) > div:last-child { grid-column: 1 / -1; justify-self: center; width: calc(50% - 7.5px); }
         
         .role-card { padding: 20px; border-radius: 12px; cursor: pointer; color: white; transition: 0.3s; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); font-size: 1.1rem; font-weight: bold; display: flex; flex-direction: column; justify-content: center; align-items: center; }
@@ -40,13 +43,16 @@
         .btn-outline { background: white; border: 2px solid var(--primary); color: var(--primary); }
         .btn-outline:hover { background: #eff6ff; }
 
-        .back-nav { position: absolute; top: 25px; left: 30px; z-index: 100; cursor: pointer; display: flex; align-items: center; color: #475569; font-weight: bold; font-size: 1.1rem; transition: 0.2s; padding: 10px; border-radius: 8px; }
+        /* 💡 修正 3：將返回按鈕固定在螢幕左上角，滑動時才不會消失 */
+        .back-nav { position: fixed; top: 20px; left: 20px; z-index: 100; cursor: pointer; display: flex; align-items: center; color: #475569; font-weight: bold; font-size: 1.1rem; transition: 0.2s; padding: 10px; border-radius: 8px; background: rgba(255,255,255,0.8); backdrop-filter: blur(5px); }
         .back-nav:hover { background: #e2e8f0; }
 
         /* ====== 主手冊介面 ====== */
-        #manual-interface { flex-direction: row; }
-        #sidebar { width: 280px; background: var(--sidebar-bg); color: white; padding: 20px 10px; overflow-y: auto; flex-shrink: 0; box-shadow: 2px 0 10px rgba(0,0,0,0.1); z-index: 10; }
-        #main-content { flex: 1; display: flex; flex-direction: column; padding: 40px; align-items: center; overflow-y: auto; position: relative; }
+        #manual-interface { flex-direction: row; height: 100dvh; }
+        #sidebar { width: 280px; background: var(--sidebar-bg); color: white; padding: 20px 10px; overflow-y: auto; flex-shrink: 0; box-shadow: 2px 0 10px rgba(0,0,0,0.1); z-index: 10; height: 100dvh; }
+        
+        /* 💡 修正 4：讓內容區塊可以獨立滑動，並保留底部空白以免被選單按鈕擋住 */
+        #main-content { flex: 1; display: flex; flex-direction: column; padding: 40px 40px 100px 40px; align-items: center; overflow-y: auto; height: 100dvh; position: relative; }
         
         .acc-btn { background: #1e293b; color: #e2e8f0; cursor: pointer; padding: 14px; width: 100%; border: none; text-align: left; border-radius: 6px; margin-bottom: 5px; font-weight: bold; font-size: 1.05rem; }
         .acc-btn:hover { background: #3b82f6; }
@@ -57,12 +63,11 @@
         .tab-item { padding: 8px 20px; cursor: pointer; border-radius: 20px; background: #e2e8f0; color: #475569; font-weight: bold; transition: 0.2s; }
         .tab-item.active { background: var(--primary); color: white; }
 
-        #text-box { background: white; padding: 30px; border-radius: 12px; width: 100%; max-width: 940px; border-left: 6px solid var(--primary); box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 30px; }
+        #text-box { background: white; padding: 30px; border-radius: 12px; width: 100%; max-width: 940px; border-left: 6px solid var(--primary); box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 30px; flex-shrink: 0; }
         #v-title { margin-top: 0; font-size: 1.5rem; color: #1e293b; margin-bottom: 10px; }
         #v-desc { margin: 0; font-size: 1.1rem; color: #475569; line-height: 1.6; }
 
-        /* ====== 🖼️ 展示框架與內容 (完美貼合修正) ====== */
-        #media-container { width: 100%; display: flex; justify-content: center; margin-bottom: 50px; }
+        #media-container { width: 100%; display: flex; justify-content: center; margin-bottom: 50px; flex-shrink: 0; }
         
         #media-wrapper {
             display: inline-flex; 
@@ -78,104 +83,73 @@
             width: auto;     
             height: auto;
             max-width: 100%; 
-            max-height: 55vh; 
+            max-height: 55dvh; 
             border-radius: 8px;
             clip-path: inset(2px round 8px); 
             display: none; 
         }
 
-        /* ====== 📱 響應式設計 (手機/平板 RWD) ====== */
+        /* ====== 📱 響應式設計 (手機/平板/橫向 RWD) ====== */
         @media (max-width: 768px) {
-            .welcome-title { font-size: 2rem; }
+            .welcome-title { font-size: 2rem; margin-top: 20px; }
             .welcome-subtitle { font-size: 1.4rem; margin-bottom: 25px; }
             .btn { padding: 12px 25px; font-size: 1rem; margin-bottom: 10px; }
-
-            /* 手機版首頁按鈕排版：改為上下堆疊且等寬 */
-            .welcome-actions { flex-direction: column; width: 100%; max-width: 350px; padding: 0 20px; margin: 0 auto; }
+            .welcome-actions { flex-direction: column; width: 100%; max-width: 350px; padding: 0 20px; margin: 0 auto auto auto; }
             .welcome-actions .btn { width: 100%; margin-bottom: 15px; }
             
-            /* 身分卡片變單列 */
             .role-grid { grid-template-columns: 1fr; padding: 10px; }
             .role-grid > div:last-child { width: 100% !important; justify-self: stretch !important; }
             
-            /* 快速導覽資訊改為「兩兩一排」 */
             #quick-guide-list {
                 display: grid !important; 
                 grid-template-columns: repeat(2, 1fr); 
-                gap: 10px;
-                padding: 0 10px;
-                height: auto !important; 
-                margin-bottom: 15px !important; /* 縮小與下方按鈕的間距 */
+                gap: 10px; padding: 0 10px; height: auto !important; margin-bottom: 15px !important; 
             }
             #quick-guide-list .btn {
-                width: 100%;
-                height: 100%;
-                min-height: 60px; 
-                white-space: normal; 
-                padding: 10px;
-                font-size: 0.95rem !important;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                margin-bottom: 0;
+                width: 100%; height: 100%; min-height: 60px; white-space: normal; padding: 10px;
+                font-size: 0.95rem !important; display: flex; align-items: center; justify-content: center; margin-bottom: 0;
             }
 
-            /* 💡 修正 1：對齊「查看所有操作手冊」的寬度與高度 */
             #full-manual-btn {
-                width: calc(100% - 20px) !important; /* 扣除左右各 10px 的間距以對齊上方 Grid */
-                margin: 0 10px !important;           /* 左右保留 10px 邊距 */
-                min-height: 60px;                    /* 與上方按鈕同高 */
-                padding: 10px;
-                font-size: 0.95rem !important;
-                display: flex;
-                align-items: center;
-                justify-content: center;
+                width: calc(100% - 20px) !important; margin: 0 10px !important; min-height: 60px; padding: 10px;
+                font-size: 0.95rem !important; display: flex; align-items: center; justify-content: center;
             }
 
-            /* 💡 修正 2：確保右下角目錄選單在不需要時徹底隱藏 */
-            /* 不要直接用 #manual-interface { display: block; }，這會覆蓋隱藏屬性 */
             .interface-container.active#manual-interface { display: block; } 
             
             #sidebar { 
-                position: fixed; 
-                top: 0; 
-                left: -100%; 
-                width: 80%; 
-                max-width: 300px; 
-                height: 100vh; 
-                max-height: 100vh; 
-                z-index: 9999; 
-                transition: left 0.3s ease; 
-                overflow-y: auto; 
-                padding-bottom: 80px; 
-                border-right: 2px solid #0f172a;
+                position: fixed; top: 0; left: -100%; width: 80%; max-width: 300px; 
+                height: 100dvh; z-index: 9999; transition: left 0.3s ease; overflow-y: auto; 
+                padding-bottom: 80px; border-right: 2px solid #0f172a;
             }
             #sidebar.active { left: 0; }
-            #main-content { padding: 20px 15px; }
             
-            /* 手機版遮罩層與漢堡按鈕設定 */
-            .sidebar-overlay {
-                display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-                background: rgba(0,0,0,0.6); z-index: 9998;
-            }
+            /* 💡 修正 5：確保手機版主畫面可以順暢向下滑動，並留出 120px 底部空間給右下角按鈕 */
+            #main-content { display: block; padding: 20px 15px 120px 15px; height: 100dvh; overflow-y: auto; }
+            
+            .sidebar-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); z-index: 9998; }
             .sidebar-overlay.active { display: block; }
             
             .mobile-menu-btn {
                 display: flex !important; align-items: center; justify-content: center;
-                position: fixed; bottom: 20px; right: 20px;
-                background: #3b82f6; color: white; border: none; border-radius: 50%;
-                width: 60px; height: 60px; font-size: 1.8rem;
+                position: fixed; bottom: 20px; right: 20px; background: #3b82f6; color: white; 
+                border: none; border-radius: 50%; width: 60px; height: 60px; font-size: 1.8rem;
                 z-index: 9997; box-shadow: 0 4px 10px rgba(0,0,0,0.3); cursor: pointer;
             }
             
-            /* 文字框與內容縮放 */
             #text-box { padding: 20px; }
             #v-title { font-size: 1.3rem; }
             #v-desc { font-size: 1rem; }
-            .media-content { max-height: 40vh; }
             
-            /* 返回鍵優化 */
-            .back-nav { top: 15px; left: 15px; background: rgba(255,255,255,0.8); backdrop-filter: blur(5px); }
+            /* 💡 手機版圖片與影片改為 100% 寬度自適應，不再被截斷 */
+            .media-content { max-height: none; width: 100%; height: auto; }
+        }
+
+        /* 💡 針對手機「橫向」模式加強優化 */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .page { padding-top: 60px; justify-content: flex-start; }
+            .role-grid { grid-template-columns: repeat(2, 1fr); }
+            #main-content { padding-bottom: 80px; }
         }
     </style>
 </head>
@@ -202,8 +176,8 @@
         </div>
         <div id="page-guide" class="page">
             <div class="back-nav" onclick="showIntroPage('page-roles')">⬅ 重新選擇身分</div>
-            <h2 id="role-title" style="font-size: 1.8rem; margin-bottom: 30px; color: #1e293b;"></h2>
-            <div id="quick-guide-list" style="display:flex; flex-wrap:wrap; justify-content:center; gap:15px; max-width:800px; margin-bottom:50px;"></div>
+            <h2 id="role-title" style="font-size: 1.8rem; margin-bottom: 30px; color: #1e293b; margin-top: 20px;"></h2>
+            <div id="quick-guide-list" style="display:flex; flex-wrap:wrap; justify-content:center; gap:15px; max-width:800px; margin-bottom:30px;"></div>
             <button id="full-manual-btn" class="btn btn-primary" onclick="enterFullManual()">查看所有操作手冊</button>
         </div>
     </div>
@@ -230,7 +204,7 @@
             <div id="media-container">
                 <div id="media-wrapper">
                     <img id="display-img" class="media-content" src="" alt="教學截圖">
-                    <video id="display-video" class="media-content" src="" autoplay loop muted playsinline></video>
+                    <video id="display-video" class="media-content" src="" autoplay loop muted playsinline controls></video>
                 </div>
             </div>
         </div>
@@ -242,7 +216,10 @@
         let currentRole = "";
 
         function showIntroPage(pageId) {
-            document.querySelectorAll('#intro-interface .page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('#intro-interface .page').forEach(p => {
+                p.classList.remove('active');
+                p.scrollTop = 0; // 切換頁面時自動捲動回最上方
+            });
             document.getElementById(pageId).classList.add('active');
         }
 
@@ -390,6 +367,9 @@
                 img.src = file;
                 img.style.display = 'block'; 
             }
+            
+            // 💡 點擊切換時，自動將畫面捲動回上方
+            document.getElementById('main-content').scrollTop = 0;
         }
     </script>
 </body>
