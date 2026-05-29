@@ -7,16 +7,13 @@
     <style>
         :root { --primary: #3b82f6; --bg: #f8fafc; --sidebar-bg: #0f172a; font-size: 125%; }
         * { box-sizing: border-box; } 
-        /* 💡 修正 1：改用 100dvh (動態視窗高度) 解決手機瀏覽器網址列遮擋問題 */
         body { font-family: 'Microsoft JhengHei', sans-serif; margin: 0; height: 100dvh; overflow: hidden; background: var(--bg); }
         
         .interface-container { width: 100%; height: 100dvh; display: none; overflow: hidden; }
         .interface-container.active { display: flex; }
 
-        /* ====== 歡迎頁 & 身分選擇頁 ====== */
         #intro-interface { flex-direction: column; align-items: center; justify-content: center; position: relative; }
         
-        /* 💡 修正 2：確保獨立頁面 (如身分選擇、快速導覽) 內容過長時可以滑動 */
         .page { 
             display: none; flex-direction: column; align-items: center; justify-content: flex-start; 
             width: 100%; height: 100dvh; overflow-y: auto; padding: 80px 20px 40px 20px; animation: fadeIn 0.4s; text-align: center; 
@@ -43,7 +40,6 @@
         .btn-outline { background: white; border: 2px solid var(--primary); color: var(--primary); }
         .btn-outline:hover { background: #eff6ff; }
 
-        /* 💡 修正 3：將返回按鈕固定在螢幕左上角，滑動時才不會消失 */
         .back-nav { position: fixed; top: 20px; left: 20px; z-index: 100; cursor: pointer; display: flex; align-items: center; color: #475569; font-weight: bold; font-size: 1.1rem; transition: 0.2s; padding: 10px; border-radius: 8px; background: rgba(255,255,255,0.8); backdrop-filter: blur(5px); }
         .back-nav:hover { background: #e2e8f0; }
 
@@ -51,7 +47,6 @@
         #manual-interface { flex-direction: row; height: 100dvh; }
         #sidebar { width: 280px; background: var(--sidebar-bg); color: white; padding: 20px 10px; overflow-y: auto; flex-shrink: 0; box-shadow: 2px 0 10px rgba(0,0,0,0.1); z-index: 10; height: 100dvh; }
         
-        /* 💡 修正 4：讓內容區塊可以獨立滑動，並保留底部空白以免被選單按鈕擋住 */
         #main-content { flex: 1; display: flex; flex-direction: column; padding: 40px 40px 100px 40px; align-items: center; overflow-y: auto; height: 100dvh; position: relative; }
         
         .acc-btn { background: #1e293b; color: #e2e8f0; cursor: pointer; padding: 14px; width: 100%; border: none; text-align: left; border-radius: 6px; margin-bottom: 5px; font-weight: bold; font-size: 1.05rem; }
@@ -67,16 +62,42 @@
         #v-title { margin-top: 0; font-size: 1.5rem; color: #1e293b; margin-bottom: 10px; }
         #v-desc { margin: 0; font-size: 1.1rem; color: #475569; line-height: 1.6; }
 
+        /* ====== YouTube 按鈕專屬樣式 ====== */
+        #youtube-actions {
+            display: none; /* 預設隱藏，由 JS 控制顯示 */
+            flex-direction: row;
+            gap: 15px;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px dashed #cbd5e1;
+            justify-content: center;
+        }
+        .yt-btn {
+            padding: 12px 25px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: bold;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .yt-btn-android { background: #10b981; color: white; }
+        .yt-btn-android:hover { background: #059669; transform: translateY(-2px); box-shadow: 0 6px 12px rgba(16,185,129,0.3); }
+        .yt-btn-ios { background: #1e293b; color: white; }
+        .yt-btn-ios:hover { background: #0f172a; transform: translateY(-2px); box-shadow: 0 6px 12px rgba(30,41,59,0.3); }
+
         #media-container { width: 100%; display: flex; justify-content: center; margin-bottom: 50px; flex-shrink: 0; }
         
         #media-wrapper {
             display: inline-flex; 
             max-width: 100%; 
-            background: white; 
-            padding: 5px; 
-            border: 2px solid #cbd5e1; 
-            border-radius: 12px; 
-            box-shadow: 0 25px 35px -5px rgba(0,0,0,0.15), 0 15px 15px -5px rgba(0,0,0,0.1), inset 0 2px 3px rgba(255,255,255,0.8);
+            background: transparent; 
+            position: relative;
         }
 
         .media-content { 
@@ -85,11 +106,98 @@
             max-width: 100%; 
             max-height: 55dvh; 
             border-radius: 8px;
-            clip-path: inset(2px round 8px); 
+            box-shadow: 0 25px 35px -5px rgba(0,0,0,0.15), 0 15px 15px -5px rgba(0,0,0,0.1);
+            border: 2px solid #cbd5e1; 
             display: none; 
         }
 
-        /* ====== 📱 響應式設計 (手機/平板/橫向 RWD) ====== */
+        /* ====== PDF 專屬卡片樣式優化 ====== */
+        #display-pdf-actions {
+            display: none; 
+            flex-direction: column; 
+            gap: 15px; 
+            padding: 35px 40px; 
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+            border: 1px solid #e2e8f0;
+            width: 100%;
+            min-width: 280px;
+            align-items: center; 
+            justify-content: center;
+        }
+        .pdf-btn {
+            width: 100%;
+            padding: 14px 20px; 
+            border-radius: 8px; 
+            border: none; 
+            cursor: pointer; 
+            font-size: 1.15rem; 
+            font-weight: bold; 
+            transition: 0.3s; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 10px;
+        }
+        .pdf-btn-view { background: #3b82f6; color: white; }
+        .pdf-btn-view:hover { background: #2563eb; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(59,130,246,0.3); }
+        .pdf-btn-dl { background: #10b981; color: white; }
+        .pdf-btn-dl:hover { background: #059669; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(16,185,129,0.3); }
+        
+        /* ====== PDF 全螢幕瀏覽器優化 ====== */
+        #pdf-modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.85); z-index: 10000; align-items: center; 
+            justify-content: center; backdrop-filter: blur(5px);
+        }
+        #pdf-modal-content {
+            width: 95%; height: 95%; max-width: 1400px; background: #f8fafc; 
+            border-radius: 12px; overflow: hidden; 
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+            display: flex; flex-direction: column;
+        }
+        /* PDF 頂部工具列 */
+        .pdf-modal-header {
+            background: #1e293b;
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #0f172a;
+            flex-shrink: 0;
+        }
+        .pdf-modal-title {
+            color: white;
+            font-size: 1.1rem;
+            font-weight: bold;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 60%;
+        }
+        .pdf-modal-tools {
+            display: flex;
+            gap: 10px;
+        }
+        .tool-btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            border: none;
+            font-size: 0.95rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .tool-btn-dl { background: #10b981; color: white; }
+        .tool-btn-dl:hover { background: #059669; }
+        .tool-btn-close { background: #ef4444; color: white; }
+        .tool-btn-close:hover { background: #dc2626; }
+
+        /* 手機版適應 */
         @media (max-width: 768px) {
             .welcome-title { font-size: 2rem; margin-top: 20px; }
             .welcome-subtitle { font-size: 1.4rem; margin-bottom: 25px; }
@@ -124,7 +232,6 @@
             }
             #sidebar.active { left: 0; }
             
-            /* 💡 修正 5：確保手機版主畫面可以順暢向下滑動，並留出 120px 底部空間給右下角按鈕 */
             #main-content { display: block; padding: 20px 15px 120px 15px; height: 100dvh; overflow-y: auto; }
             
             .sidebar-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); z-index: 9998; }
@@ -141,11 +248,17 @@
             #v-title { font-size: 1.3rem; }
             #v-desc { font-size: 1rem; }
             
-            /* 💡 手機版圖片與影片改為 100% 寬度自適應，不再被截斷 */
             .media-content { max-height: none; width: 100%; height: auto; }
+
+            #display-pdf-actions { padding: 25px 20px; width: 100%; min-width: unset; }
+            #pdf-modal-content { width: 100%; height: 100%; border-radius: 0; }
+            .tool-btn span { display: none; } /* 手機版只顯示圖示省空間 */
+            
+            /* 手機版 YouTube 按鈕變成垂直排列 */
+            #youtube-actions { flex-direction: column; }
+            .yt-btn { width: 100%; }
         }
 
-        /* 💡 針對手機「橫向」模式加強優化 */
         @media (max-height: 500px) and (orientation: landscape) {
             .page { padding-top: 60px; justify-content: flex-start; }
             .role-grid { grid-template-columns: repeat(2, 1fr); }
@@ -160,14 +273,14 @@
             <div class="welcome-title">歡迎使用</div>
             <div class="welcome-subtitle">外來入侵種動物防治通報網 - 管理者模式</div>
             <div class="welcome-actions">
-                <button class="btn btn-outline" onclick="window.open('https://fonghs.emct.tw/tis/login')">進入 TIS 網站</button>
+                <button class="btn btn-outline" onclick="window.open('https://fonghs.emct.tw/tis/login')">進入 TIS 網站(測試版)</button>
                 <button class="btn btn-primary" onclick="showIntroPage('page-roles')">操作手冊</button>
             </div>
         </div>
 
         <div id="page-roles" class="page">
             <div class="back-nav" onclick="showIntroPage('page-welcome')">⬅ 回首頁</div>
-            <h2 style="font-size: 1.8rem; margin-bottom: 20px; color: #1e293b;">請選擇您的身分</h2>
+            <h2 style="font-size: 1.8rem; margin-bottom: 20px; color: #1e293b; margin-top: 20px;">請選擇您的身分</h2>
             <div class="role-grid">
                 <div class="role-card" style="background:#eab308" onclick="selectRole('管理者')"><span style="font-size:1.1rem">管理者</span><small>[地方政府]</small></div>
                 <div class="role-card" style="background:#3b82f6" onclick="selectRole('點收者')"><span style="font-size:1.1rem">點收者</span><small>[點收廠商]</small></div>
@@ -176,7 +289,36 @@
         </div>
         <div id="page-guide" class="page">
             <div class="back-nav" onclick="showIntroPage('page-roles')">⬅ 重新選擇身分</div>
-            <h2 id="role-title" style="font-size: 1.8rem; margin-bottom: 30px; color: #1e293b; margin-top: 20px;"></h2>
+            
+            <div id="temp-bulletin" style="background-color: #fefce8; border: 2px solid #fde047; border-radius: 12px; padding: 20px; width: 100%; max-width: 800px; margin: 20px auto 30px auto; box-shadow: 0 4px 15px rgba(234, 179, 8, 0.15); text-align: left;">
+                <div style="display: flex; align-items: center; margin-bottom: 15px; justify-content: center;">
+                    <span style="font-size: 1.8rem; margin-right: 12px;">📣</span>
+                    <strong style="font-size: 1.25rem; color: #854d0e;">115 年 6 月 9 日，新網站與 App 同步更新</strong>
+                </div>
+                
+                <div style="display: flex; gap: 15px; flex-wrap: wrap; justify-content: center;">
+                    <button class="btn" style="background: #ffffff; border: 2px solid #d97706; color: #d97706; border-radius: 30px; padding: 10px 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; flex: 1; min-width: 200px; max-width: 240px;" 
+                            onclick="jumpToManualByTitle('Android 用戶')"
+                            onmouseover="this.style.background='#fef3c7'" onmouseout="this.style.background='#ffffff'">
+                        <div style="font-weight: bold; font-size: 1.05rem;">📱 如何更新密碼</div>
+                        <div style="font-size: 0.9rem;">(Android 看這邊)</div>
+                    </button>
+                    
+                    <button class="btn" style="background: #ffffff; border: 2px solid #d97706; color: #d97706; border-radius: 30px; padding: 10px 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; flex: 1; min-width: 200px; max-width: 240px;" 
+                            onclick="jumpToManualByTitle('iPhone 用戶')"
+                            onmouseover="this.style.background='#fef3c7'" onmouseout="this.style.background='#ffffff'">
+                        <div style="font-weight: bold; font-size: 1.05rem;">🍎 如何更新密碼</div>
+                        <div style="font-size: 0.9rem;">(iPhone 看這邊)</div>
+                    </button>
+                    
+                    <button class="btn" style="background: #ffffff; border: 2px solid #ef4444; color: #ef4444; border-radius: 30px; padding: 10px 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; flex: 1; min-width: 200px; max-width: 240px;" 
+                            onclick="jumpToManualByTitle('忘記密碼', 'App指南')"
+                            onmouseover="this.style.background='#fee2e2'" onmouseout="this.style.background='#ffffff'">
+                        <div style="font-weight: bold; font-size: 1.1rem;">❓ 忘記密碼怎麼辦？</div>
+                    </button>
+                </div>
+            </div>
+            <h2 id="role-title" style="font-size: 1.8rem; margin-bottom: 30px; color: #1e293b; margin-top: 0;"></h2>
             <div id="quick-guide-list" style="display:flex; flex-wrap:wrap; justify-content:center; gap:15px; max-width:800px; margin-bottom:30px;"></div>
             <button id="full-manual-btn" class="btn btn-primary" onclick="enterFullManual()">查看所有操作手冊</button>
         </div>
@@ -199,31 +341,94 @@
             <div id="text-box">
                 <h3 id="v-title"></h3>
                 <p id="v-desc"></p>
+                
+                <div id="youtube-actions">
+                    <button class="yt-btn yt-btn-android" onclick="window.open('https://www.youtube.com/shorts/56zBTa6I6BM', '_blank')">🤖 Android 操作影片</button>
+                    <button class="yt-btn yt-btn-ios" onclick="window.open('https://www.youtube.com/shorts/oLcqaVoGOxE', '_blank')">🍎 iOS 操作影片</button>
+                </div>
             </div>
             
             <div id="media-container">
                 <div id="media-wrapper">
                     <img id="display-img" class="media-content" src="" alt="教學截圖">
                     <video id="display-video" class="media-content" src="" autoplay loop muted playsinline controls></video>
+                    
+                    <div id="display-pdf-actions">
+                        <button id="pdf-view-btn" class="pdf-btn pdf-btn-view">📄 線上瀏覽</button>
+                        <button id="pdf-download-btn" class="pdf-btn pdf-btn-dl">⬇️ 下載 PDF</button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
+    <div id="pdf-modal">
+        <div id="pdf-modal-content">
+            <div class="pdf-modal-header">
+                <div class="pdf-modal-title" id="pdf-modal-title">PDF 文件</div>
+                <div class="pdf-modal-tools">
+                    <button class="tool-btn tool-btn-dl" id="modal-inner-dl-btn">⬇️ <span>下載</span></button>
+                    <button class="tool-btn tool-btn-close" onclick="closePdfModal()">✖ <span>關閉</span></button>
+                </div>
+            </div>
+            <iframe id="pdf-iframe" src="" style="flex: 1; width:100%; border:none; background: white;"></iframe>
+        </div>
+    </div>
+
     <script>
-        const nestedData = {"監測圖台": {"首頁": [{"id": "Capture_監測圖台_0_首頁貌.mp4", "img": "Capture_監測圖台_0_首頁貌.mp4", "tabName": "入侵種通報監測與數據導出", "desc": "以地圖呈現外來入侵種動物的通報現況。可依日期及行政區篩選數據，並「CSV 下載」匯出資料。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者", "使用者"]}], "不同檢視模式": [{"id": "Capture_監測圖台_點位.mp4", "img": "Capture_監測圖台_點位.mp4", "tabName": "點位-實際分布位置", "desc": "外來入侵種的點位分布圖，提供地理位置與數據總覽。可透過篩選器和地圖快速掌握物種分佈與防治進度。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者", "使用者"]}, {"id": "Capture_監測圖台_行政區.mp4", "img": "Capture_監測圖台_行政區.mp4", "tabName": "行政區-各區分佈位置", "desc": "外來入侵種的行政區分布圖。透過行政區劃及色彩深淺呈現物種數量熱點，可快速掌握各區域入侵種密度。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者", "使用者"]}, {"id": "Capture_監測圖台_網格.mp4", "img": "Capture_監測圖台_網格.mp4", "tabName": "網格-模糊分布位置", "desc": "外來入侵種的網格分布圖。突破人為劃分的行政區限制，可檢視10 Km×10 Km 的統計數據。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者", "使用者"]}], "篩選": [{"id": "Capture_監測圖台_時間篩選.mp4", "img": "Capture_監測圖台_時間篩選.mp4", "tabName": "篩選時間進行展示", "desc": "可透過日期篩選器設定時間範圍，動態檢視及下載原始資料。點擊「CSV下載」鈕，快速匯出詳細資料進行分析。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者", "使用者"]}, {"id": "Capture_監測圖台_行政區篩選.mp4", "img": "Capture_監測圖台_行政區篩選.mp4", "tabName": "篩選行政區進行展示", "desc": "可透過行政區篩選器設定地理範圍，動態檢視及下載原始資料。點擊「CSV下載」鈕，快速匯出詳細資料進行分析。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者", "使用者"]}], "CSV下載": [{"id": "Capture_監測圖台_CSV下載.mp4", "img": "Capture_監測圖台_CSV下載.mp4", "tabName": "原始資料匯出", "desc": "可依日期及行政區篩選數據，鎖定目標資訊。點擊「CSV下載」匯出數據，以便核對資訊。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者", "使用者"]}], "圖資展示": [{"id": "Capture_監測圖台_變更底圖.mp4", "img": "Capture_監測圖台_變更底圖.mp4", "tabName": "地圖底圖切換管理", "desc": "選擇地圖底圖。點擊「變更底圖」後，選取單一類型再按「確定」即可。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者", "使用者"]}, {"id": "Capture_監測圖台_圖層套疊.mp4", "img": "Capture_監測圖台_圖層套疊.mp4", "tabName": "圖台空間圖資展示", "desc": "設定圖資展示圖層。可從「選擇」勾選複數地理資訊圖層，以利進行資料分析與情勢判讀。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者", "使用者"]}]}, "統計圖表": {"首頁": [{"id": "Capture_統計圖表_0_首頁貌.mp4", "img": "Capture_統計圖表_0_首頁貌.mp4", "tabName": "綠鬣蜥通報趨勢分析", "desc": "提供外來入侵種的統計圖，以柱狀圖呈現顯示過去十二個月的資訊。可透過「篩選」與「圖表下載」或「CSV下載」，分析應用資訊，作為制定防治策略及資源配置的依據。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者"]}], "篩選": [{"id": "Capture_統計圖表_月份篩選.mp4", "img": "Capture_統計圖表_月份篩選.mp4", "tabName": "月份篩選設定", "desc": "透過「篩選」設定統計圖表顯示內容。可選擇指定月份，顯示十二個月的統計資料，客製化統計圖表。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者"]}, {"id": "Capture_統計圖表_篩選.mp4", "img": "Capture_統計圖表_篩選.mp4", "tabName": "統計圖表篩選設定", "desc": "透過「篩選」設定統計圖表顯示內容。可選物種性別、行政區及資料集，客製化統計圖表。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者"]}], "不同統計主題": [{"id": "Capture_統計圖表_性別組成變化.mp4", "img": "Capture_統計圖表_性別組成變化.mp4", "tabName": "綠鬣蜥性別組成變化", "desc": "顯示綠鬣蜥十二個月性別組成變化，協助掌握族群動態。可點擊「圖表下載」或「CSV下載」功能，匯出原始資料進行分析與報告。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者"]}, {"id": "Capture_統計圖表_捕捉移除(時間).mp4", "img": "Capture_統計圖表_捕捉移除(時間).mp4", "tabName": "綠鬣蜥捕捉移除(時間)", "desc": "顯示綠鬣蜥十二個月的回報趨勢。可點擊「圖表下載」或「CSV下載」功能，匯出原始資料進行分析與報告。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者"]}, {"id": "Capture_統計圖表_捕捉移除(縣市).mp4", "img": "Capture_統計圖表_捕捉移除(縣市).mp4", "tabName": "綠鬣蜥捕捉移除(縣市)", "desc": "顯示綠鬣蜥十二個月各縣市捕捉移除總量變化。可點擊「圖表下載」或「CSV下載」功能，匯出原始資料進行分析與報告。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者"]}], "資料下載": [{"id": "Capture_統計圖表_圖表下載.mp4", "img": "Capture_統計圖表_圖表下載.mp4", "tabName": "圖表下載", "desc": "可依需求，下載制式圖表。可依月份、性別、行政區、資料集篩選數據，調整顯示資訊。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者"]}, {"id": "Capture_統計圖表_CSV下載.mp4", "img": "Capture_統計圖表_CSV下載.mp4", "tabName": "CSV下載", "desc": "可依需求，迅速自行重繪圖表。可依月份、性別、行政區、資料集篩選數據，匯出資料。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者"]}]}, "調查資料": {"首頁": [{"id": "Capture_調查資料_0_首頁貌.mp4", "img": "Capture_調查資料_0_首頁貌.mp4", "tabName": "數據總覽", "desc": "檢視資料總覽。可透過搜尋與篩選，快速查找特定數據。並可「CSV下載」及「照片下載」，供後續點收、審核、報告、統計使用。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者"]}], "篩選": [{"id": "Capture_調查資料_篩選.mp4", "img": "Capture_調查資料_篩選.mp4", "tabName": "篩選調查資料", "desc": "快速查找特定條件資料。透過「篩選」尋找特定「調查時間」、「點收」狀態、「資料審核」狀態、「隻數」區間、「調查單位」、「調查位置」，並下載CSV。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者"]}], "不同資料集切換": [{"id": "Capture_調查資料_捕捉移除.png", "img": "Capture_調查資料_捕捉移除.png", "tabName": "綠鬣蜥捕捉移除", "desc": "顯示綠鬣蜥捕捉移除的詳細資料。可透過關鍵字搜尋、篩選，並下載CSV或照片進行數據分析與管理。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者"]}, {"id": "Capture_調查資料_通報.png", "img": "Capture_調查資料_通報.png", "tabName": "綠鬣蜥通報", "desc": "顯示綠鬣蜥通報的詳細資料。可透過關鍵字搜尋、篩選，並下載CSV或照片進行數據分析與管理。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者"]}, {"id": "Capture_調查資料_通報-TBN介接.png", "img": "Capture_調查資料_通報-TBN介接.png", "tabName": "綠鬣蜥通報-TBN介接", "desc": "顯示綠鬣蜥通報-TBN介接的詳細資料。可透過關鍵字搜尋、篩選，並下載CSV。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者"]}], "編輯資料": [{"id": "Capture_調查資料_編輯資料.mp4", "img": "Capture_調查資料_編輯資料.mp4", "tabName": "編輯入侵種調查記錄", "desc": "確保資料的正確性。透過點擊「編輯」按鈕，可修改資料欄位，包含：隻數、性別及吻肛長，確認後點選「更新資料」即可完成變動。", "roles": ["超級管理者", "管理者"]}], "詳細資料": [{"id": "Capture_調查資料_詳細資料.mp4", "img": "Capture_調查資料_詳細資料.mp4", "tabName": "入侵種調查紀錄詳情", "desc": "呈現單筆調查的完整資料與照片。可審閱所有細節，並透過右上角的「編輯」或「封存」按鈕進行管理。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者"]}], "點收": [{"id": "Capture_調查資料_點收.mp4", "img": "Capture_調查資料_點收.mp4", "tabName": "點收調查資料", "desc": "透過「全選」或「勾選特定資料」進行批次點收註記。針對已點收資料再次點擊，即可取消狀態。", "roles": ["管理者", "點收者"]}], "審核": [{"id": "Capture_調查資料_審核.mp4", "img": "Capture_調查資料_審核.mp4", "tabName": "審核調查資料", "desc": "於詳細資料點選「未審核」，再透過「正確」或「錯誤」完成審查。若審核為錯誤，可同步記錄正確資訊。", "roles": ["資料審核者"]}], "封存": [{"id": "Capture_調查資料_封存.mp4", "img": "Capture_調查資料_封存.mp4", "tabName": "封存調查資料", "desc": "將錯誤的資料進行封存。可檢閱已封存的記錄，並進行資料還原，有效管理數據。", "roles": ["超級管理者", "管理者"]}], "資料下載": [{"id": "Capture_調查資料_CSV下載.mp4", "img": "Capture_調查資料_CSV下載.mp4", "tabName": "CSV下載", "desc": "瀏覽與管理調查資料。可依「篩選」，匯出數據，點擊「CSV下載」匯出數據，以後續應用。另外可「編輯」、「封存」資料。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者"]}, {"id": "Capture_調查資料_照片下載.mp4", "img": "Capture_調查資料_照片下載.mp4", "tabName": "照片下載", "desc": "可依需求，下載「原始照片」及帶有「浮水印」的照片。可依「篩選」，鎖定目標資訊，點擊「照片下載」匯出資料，以後續應用。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者"]}]}, "帳號管理": {"首頁": [{"id": "Capture_帳號管理_0_首頁貌.mp4", "img": "Capture_帳號管理_0_首頁貌.mp4", "tabName": "用戶基本資料與狀態總覽", "desc": "進行帳號管理。可以搜尋、篩選、新增與編輯用戶資訊。", "roles": ["超級管理者", "管理者"]}], "搜尋": [{"id": "Capture_帳號管理_搜尋.mp4", "img": "Capture_帳號管理_搜尋.mp4", "tabName": "搜尋特定帳號", "desc": "透過關鍵字快速搜尋，方便檢視並查詢特定帳號。", "roles": ["超級管理者", "管理者"]}], "單位篩選": [{"id": "Capture_帳號管理_所有單位.mp4", "img": "Capture_帳號管理_所有單位.mp4", "tabName": "篩選相同單位的帳號", "desc": "快速查找特定帳號。透過「單位篩選」尋找目標帳號，並可以結合「勾選」進行批次開通、停用或下載帳號卡。", "roles": ["超級管理者", "管理者"]}], "新增帳號": [{"id": "Capture_帳號管理_新增帳號(單筆).mp4", "img": "Capture_帳號管理_新增帳號(單筆).mp4", "tabName": "新增單筆帳號", "desc": "迅速開通帳號。設定新帳號的權限、單位與姓名，並可選擇設定開通與停用日期。填寫後，點擊「新增帳號」建立。", "roles": ["超級管理者", "管理者"]}, {"id": "Capture_帳號管理_新增帳號(多筆).mp4", "img": "Capture_帳號管理_新增帳號(多筆).mp4", "tabName": "新增多筆帳號", "desc": "可以一次新增多筆帳號，設定其權限、所屬單位及名稱。支援上傳帳號名單，並可彈性設定開通與停用時間。", "roles": ["超級管理者", "管理者"]}], "編輯帳號": [{"id": "Capture_帳號管理_編輯帳號.mp4", "img": "Capture_帳號管理_編輯帳號.mp4", "tabName": "編輯帳號", "desc": "針對錯誤或者需要編輯的帳號做設定。透過「┇」可以編輯帳號權限、單位、開通/停用時間。", "roles": ["超級管理者", "管理者"]}], "忘記密碼": [{"id": "Capture_帳號管理_忘記密碼.mp4", "img": "Capture_帳號管理_忘記密碼.mp4", "tabName": "忘記密碼", "desc": "點選「重置密碼」並「下載帳號卡」給用戶，用戶可憑臨時密碼登入並修改密碼。", "roles": ["超級管理者", "管理者"]}], "勾選": [{"id": "Capture_帳號管理_勾選.mp4", "img": "Capture_帳號管理_勾選.mp4", "tabName": "勾選", "desc": "透過「全選」或「勾選特定資料」進行開通、停用或下載帳號卡。針對已勾選帳號再次點擊，即可取消狀態。", "roles": ["超級管理者", "管理者"]}]}, "物種管理": {"首頁": [{"id": "Capture_物種管理_0_首頁貌.mp4", "img": "Capture_物種管理_0_首頁貌.mp4", "tabName": "總覽與維護", "desc": "檢視並維護所有外來入侵種列表。可搜尋特定物種、新增資料或啟用/停用資料庫狀態。", "roles": ["超級管理者"]}], "搜尋": [{"id": "Capture_物種管理_搜尋.mp4", "img": "Capture_物種管理_搜尋.mp4", "tabName": "搜尋物種資料庫", "desc": "透過關鍵字快速搜尋，方便檢視並查詢物種資料庫。", "roles": ["超級管理者"]}], "啟用/停用": [{"id": "Capture_物種管理_停用.mp4", "img": "Capture_物種管理_停用.mp4", "tabName": "蒐集與顯示資料管理", "desc": "確保平台資料的即時性與準確性。透過「┇」可以編輯物種名稱、啟用/停用資料集。停用資料集後，App 不再蒐集資料、且網頁版監測圖台不顯示資訊。", "roles": ["超級管理者"]}], "新增物種": [{"id": "Capture_物種管理_新增物種.mp4", "img": "Capture_物種管理_新增物種.mp4", "tabName": "系統物種名錄管理", "desc": "維護外來入侵種名錄。點擊右上方「+ 新增物種」按鈕，可新增物種名稱至資料庫。", "roles": ["超級管理者"]}], "資料集": [{"id": "Capture_物種管理_帶入既有資料集.mp4", "img": "Capture_物種管理_帶入既有資料集.mp4", "tabName": "帶入既有資料集", "desc": "迅速複製既有資料集的題目設定。可為新資料集命名、選擇既有物種及欲導入資料集，並設定填寫與管理權限。完成後，點擊「新增」建立。", "roles": ["超級管理者"]}, {"id": "Capture_物種管理_新增資料集.mp4", "img": "Capture_物種管理_新增資料集.mp4", "tabName": "新增資料集", "desc": "建立新物種資料集與權限配置。輸入資料集名稱，完成後，點擊「新增」、並完成新增題目，點擊「啟用」，即可開始蒐集資料。", "roles": ["超級管理者"]}], "題目": [{"id": "Capture_物種管理_新增題目.mp4", "img": "Capture_物種管理_新增題目.mp4", "tabName": "新增題目", "desc": "提供「文字輸入」、「選擇題」、「日期」、「上傳照片」，並支援題目標題、題目提示語、補充說明文字及必選填設定。", "roles": ["超級管理者"]}, {"id": "Capture_物種管理_編輯題目.mp4", "img": "Capture_物種管理_編輯題目.mp4", "tabName": "編輯題目", "desc": "支援編輯題目內容與必選填設定，並可透過「⌃」、「⌄」調整題目順序。", "roles": ["超級管理者"]}, {"id": "Capture_物種管理_封存題目.mp4", "img": "Capture_物種管理_封存題目.mp4", "tabName": "封存題目", "desc": "點選「封存」可於App 隱藏題目並停止資料蒐集；如需恢復，再次點擊即可「解除封存」。", "roles": ["超級管理者"]}]}, "App指南": {"下載與客服": [{"id": "F.png", "img": "F.png", "tabName": "App 下載及Line 客服", "desc": "通過掃描QR Code 下載App 或加入Line 客服開始提問。", "roles": ["使用者"]}, {"id": "App 下載.png", "img": "App 下載.png", "tabName": "App 下載 QR Code", "desc": "請掃描QR Code 下載App。", "roles": ["使用者"]}, {"id": "客服諮詢管道.png", "img": "客服諮詢管道.png", "tabName": "Line 客服 QR Code", "desc": "請掃描QR Code 加入Line 客服開始提問。", "roles": ["使用者"]}], "教學": [{"id": "B.png", "img": "B.png", "tabName": "App 操作教學", "desc": "提供拍照時的注意事項及逐步教學，可通過掃描下方QR code 觀看教學影片。", "roles": ["使用者"]}, {"id": "操作影片.png", "img": "操作影片.png", "tabName": "影片教學", "desc": "請掃描操作影片QR code 觀看教學步驟。", "roles": ["使用者"]}]}};
-        const quickGuideData = {"超級管理者": [{"id": "Capture_監測圖台_時間篩選.mp4", "label": "看特定資料"}, {"id": "Capture_監測圖台_CSV下載.mp4", "label": "下載核對資料"}, {"id": "Capture_監測圖台_圖層套疊.mp4", "label": "看地景分布"}, {"id": "Capture_統計圖表_性別組成變化.mp4", "label": "看月匯報"}, {"id": "Capture_調查資料_編輯資料.mp4", "label": "修正資料"}, {"id": "Capture_調查資料_CSV下載.mp4", "label": "需要匯報-CSV"}, {"id": "Capture_調查資料_照片下載.mp4", "label": "需要匯報-照片"}, {"id": "Capture_帳號管理_新增帳號(單筆).mp4", "label": "新增帳號"}, {"id": "Capture_物種管理_新增物種.mp4", "label": "紀錄更多入侵動物"}], "管理者": [{"id": "Capture_監測圖台_時間篩選.mp4", "label": "看特定資料"}, {"id": "Capture_監測圖台_CSV下載.mp4", "label": "下載核對資料"}, {"id": "Capture_監測圖台_圖層套疊.mp4", "label": "看地景分布"}, {"id": "Capture_統計圖表_性別組成變化.mp4", "label": "看月匯報"}, {"id": "Capture_調查資料_編輯資料.mp4", "label": "修正資料"}, {"id": "Capture_調查資料_點收.mp4", "label": "點收資料"}, {"id": "Capture_調查資料_CSV下載.mp4", "label": "需要匯報-CSV"}, {"id": "Capture_調查資料_照片下載.mp4", "label": "需要匯報-照片"}, {"id": "Capture_帳號管理_新增帳號(單筆).mp4", "label": "新增帳號"}], "資料審核者": [{"id": "Capture_監測圖台_時間篩選.mp4", "label": "看特定資料"}, {"id": "Capture_監測圖台_CSV下載.mp4", "label": "下載核對資料"}, {"id": "Capture_監測圖台_圖層套疊.mp4", "label": "看地景分布"}, {"id": "Capture_統計圖表_性別組成變化.mp4", "label": "看月匯報"}, {"id": "Capture_調查資料_審核.mp4", "label": "審核資料"}, {"id": "Capture_調查資料_CSV下載.mp4", "label": "需要匯報-CSV"}, {"id": "Capture_調查資料_照片下載.mp4", "label": "需要匯報-照片"}], "點收者": [{"id": "Capture_監測圖台_時間篩選.mp4", "label": "看特定資料"}, {"id": "Capture_監測圖台_CSV下載.mp4", "label": "下載核對資料"}, {"id": "Capture_監測圖台_圖層套疊.mp4", "label": "看地景分布"}, {"id": "Capture_統計圖表_性別組成變化.mp4", "label": "看月匯報"}, {"id": "Capture_調查資料_點收.mp4", "label": "點收資料"}, {"id": "Capture_調查資料_CSV下載.mp4", "label": "需要匯報-CSV"}, {"id": "Capture_調查資料_照片下載.mp4", "label": "需要匯報-照片"}], "使用者": [{"id": "Capture_監測圖台_時間篩選.mp4", "label": "看特定資料"}, {"id": "Capture_監測圖台_CSV下載.mp4", "label": "下載核對資料"}, {"id": "Capture_監測圖台_圖層套疊.mp4", "label": "看地景分布"}, {"id": "B.png", "label": "App 教學"}]};
+        const nestedData = {"監測圖台": {"首頁": [{"id": "Capture_監測圖台_0_首頁貌.mp4", "img": "Capture_監測圖台_0_首頁貌.mp4", "tabName": "入侵種通報監測與數據導出", "desc": "以地圖呈現外來入侵種動物的通報現況。可依日期及行政區篩選數據，並「CSV 下載」匯出資料。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者", "使用者"]}], "不同檢視模式": [{"id": "Capture_監測圖台_點位.mp4", "img": "Capture_監測圖台_點位.mp4", "tabName": "點位-實際分布位置", "desc": "外來入侵種的點位分布圖，提供地理位置與數據總覽。可透過篩選器和地圖快速掌握物種分佈與防治進度。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者", "使用者"]}, {"id": "Capture_監測圖台_行政區.mp4", "img": "Capture_監測圖台_行政區.mp4", "tabName": "行政區-各區分佈位置", "desc": "外來入侵種的行政區分布圖。透過行政區劃及色彩深淺呈現物種數量熱點，可快速掌握各區域入侵種密度。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者", "使用者"]}, {"id": "Capture_監測圖台_網格.mp4", "img": "Capture_監測圖台_網格.mp4", "tabName": "網格-模糊分布位置", "desc": "外來入侵種的網格分布圖。突破人為劃分的行政區限制，可檢視10 Km×10 Km 的統計數據。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者", "使用者"]}], "篩選": [{"id": "Capture_監測圖台_時間篩選.mp4", "img": "Capture_監測圖台_時間篩選.mp4", "tabName": "篩選時間進行展示", "desc": "可透過日期篩選器設定時間範圍，動態檢視及下載原始資料。點擊「CSV下載」鈕，快速匯出詳細資料進行分析。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者", "使用者"]}, {"id": "Capture_監測圖台_行政區篩選.mp4", "img": "Capture_監測圖台_行政區篩選.mp4", "tabName": "篩選行政區進行展示", "desc": "可透過行政區篩選器設定地理範圍，動態檢視及下載原始資料。點擊「CSV下載」鈕，快速匯出詳細資料進行分析。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者", "使用者"]}], "CSV下載": [{"id": "Capture_監測圖台_CSV下載.mp4", "img": "Capture_監測圖台_CSV下載.mp4", "tabName": "原始資料匯出", "desc": "可依日期及行政區篩選數據，鎖定目標資訊。點擊「CSV下載」匯出數據，以便核對資訊。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者", "使用者"]}], "圖資展示": [{"id": "Capture_監測圖台_變更底圖.mp4", "img": "Capture_監測圖台_變更底圖.mp4", "tabName": "地圖底圖切換管理", "desc": "選擇地圖底圖。點擊「變更底圖」後，選取單一類型再按「確定」即可。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者", "使用者"]}, {"id": "Capture_監測圖台_圖層套疊.mp4", "img": "Capture_監測圖台_圖層套疊.mp4", "tabName": "圖台空間圖資展示", "desc": "設定圖資展示圖層。可從「選擇」勾選複數地理資訊圖層，以利進行資料分析與情勢判讀。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者", "使用者"]}]}, "統計圖表": {"首頁": [{"id": "Capture_統計圖表_0_首頁貌.mp4", "img": "Capture_統計圖表_0_首頁貌.mp4", "tabName": "綠鬣蜥通報趨勢分析", "desc": "提供外來入侵種的統計圖，以柱狀圖呈現顯示過去十二個月的資訊。可透過「篩選」與「圖表下載」或「CSV下載」，分析應用資訊，作為制定防治策略及資源配置的依據。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者"]}], "篩選": [{"id": "Capture_統計圖表_月份篩選.mp4", "img": "Capture_統計圖表_月份篩選.mp4", "tabName": "月份篩選設定", "desc": "透過「篩選」設定統計圖表顯示內容。可選擇指定月份，顯示十二個月的統計資料，客製化統計圖表。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者"]}, {"id": "Capture_統計圖表_篩選.mp4", "img": "Capture_統計圖表_篩選.mp4", "tabName": "統計圖表篩選設定", "desc": "透過「篩選」設定統計圖表顯示內容。可選物種性別、行政區及資料集，客製化統計圖表。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者"]}], "不同統計主題": [{"id": "Capture_統計圖表_性別組成變化.mp4", "img": "Capture_統計圖表_性別組成變化.mp4", "tabName": "綠鬣蜥性別組成變化", "desc": "顯示綠鬣蜥十二個月性別組成變化，協助掌握族群動態。可點擊「圖表下載」或「CSV下載」功能，匯出原始資料進行分析與報告。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者"]}, {"id": "Capture_統計圖表_捕捉移除(時間).mp4", "img": "Capture_統計圖表_捕捉移除(時間).mp4", "tabName": "綠鬣蜥捕捉移除(時間)", "desc": "顯示綠鬣蜥十二個月的回報趨勢。可點擊「圖表下載」或「CSV下載」功能，匯出原始資料進行分析與報告。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者"]}, {"id": "Capture_統計圖表_捕捉移除(縣市).mp4", "img": "Capture_統計圖表_捕捉移除(縣市).mp4", "tabName": "綠鬣蜥捕捉移除(縣市)", "desc": "顯示綠鬣蜥十二個月各縣市捕捉移除總量變化。可點擊「圖表下載」或「CSV下載」功能，匯出原始資料進行分析與報告。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者"]}], "資料下載": [{"id": "Capture_統計圖表_圖表下載.mp4", "img": "Capture_統計圖表_圖表下載.mp4", "tabName": "圖表下載", "desc": "可依需求，下載制式圖表。可依月份、性別、行政區、資料集篩選數據，調整顯示資訊。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者"]}, {"id": "Capture_統計圖表_CSV下載.mp4", "img": "Capture_統計圖表_CSV下載.mp4", "tabName": "CSV下載", "desc": "可依需求，迅速自行重繪圖表。可依月份、性別、行政區、資料集篩選數據，匯出資料。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者"]}]}, "調查資料": {"首頁": [{"id": "Capture_調查資料_0_首頁貌.mp4", "img": "Capture_調查資料_0_首頁貌.mp4", "tabName": "數據總覽", "desc": "檢視資料總覽。可透過搜尋與篩選，快速查找特定數據。並可「CSV下載」及「照片下載」，供後續點收、審核、報告、統計使用。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者"]}], "篩選": [{"id": "Capture_調查資料_篩選.mp4", "img": "Capture_調查資料_篩選.mp4", "tabName": "篩選調查資料", "desc": "快速查找特定條件資料。透過「篩選」尋找特定「調查時間」、「點收」狀態、「資料審核」狀態、「隻數」區間、「調查單位」、「調查位置」，並下載CSV。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者"]}], "不同資料集切換": [{"id": "Capture_調查資料_捕捉移除.png", "img": "Capture_調查資料_捕捉移除.png", "tabName": "綠鬣蜥捕捉移除", "desc": "顯示綠鬣蜥捕捉移除的詳細資料。可透過關鍵字搜尋、篩選，並下載CSV或照片進行數據分析與管理。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者"]}, {"id": "Capture_調查資料_通報.png", "img": "Capture_調查資料_通報.png", "tabName": "綠鬣蜥通報", "desc": "顯示綠鬣蜥通報的詳細資料。可透過關鍵字搜尋、篩選，並下載CSV或照片進行數據分析與管理。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者"]}, {"id": "Capture_調查資料_通報-TBN介接.png", "img": "Capture_調查資料_通報-TBN介接.png", "tabName": "綠鬣蜥通報-TBN介接", "desc": "顯示綠鬣蜥通報-TBN介接的詳細資料。可透過關鍵字搜尋、篩選，並下載CSV。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者"]}], "編輯資料": [{"id": "Capture_調查資料_編輯資料.mp4", "img": "Capture_調查資料_編輯資料.mp4", "tabName": "編輯入侵種調查記錄", "desc": "確保資料的正確性。透過點擊「編輯」按鈕，可修改資料欄位，包含：隻數、性別及吻肛長，確認後點選「更新資料」即可完成變動。", "roles": ["超級管理者", "管理者"]}], "詳細資料": [{"id": "Capture_調查資料_詳細資料.mp4", "img": "Capture_調查資料_詳細資料.mp4", "tabName": "入侵種調查紀錄詳情", "desc": "呈現單筆調查的完整資料與照片。可審閱所有細節，並透過右上角的「編輯」或「封存」按鈕進行管理。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者"]}], "點收": [{"id": "Capture_調查資料_點收.mp4", "img": "Capture_調查資料_點收.mp4", "tabName": "點收調查資料", "desc": "透過「全選」或「勾選特定資料」進行批次點收註記。針對已點收資料再次點擊，即可取消狀態。", "roles": ["管理者", "點收者"]}], "審核": [{"id": "Capture_調查資料_審核.mp4", "img": "Capture_調查資料_審核.mp4", "tabName": "審核調查資料", "desc": "於詳細資料點選「未審核」，再透過「正確」或「錯誤」完成審查。若審核為錯誤，可同步記錄正確資訊。", "roles": ["資料審核者"]}], "封存": [{"id": "Capture_調查資料_封存.mp4", "img": "Capture_調查資料_封存.mp4", "tabName": "封存調查資料", "desc": "將錯誤的資料進行封存。可檢閱已封存的記錄，並進行資料還原，有效管理數據。", "roles": ["超級管理者", "管理者"]}], "資料下載": [{"id": "Capture_調查資料_CSV下載.mp4", "img": "Capture_調查資料_CSV下載.mp4", "tabName": "CSV下載", "desc": "瀏覽與管理調查資料。可依「篩選」，匯出數據，點擊「CSV下載」匯出數據，以後續應用。另外可「編輯」、「封存」資料。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者"]}, {"id": "Capture_調查資料_照片下載.mp4", "img": "Capture_調查資料_照片下載.mp4", "tabName": "照片下載", "desc": "可依需求，下載「原始照片」及帶有「浮水印」的照片。可依「篩選」，鎖定目標資訊，點擊「照片下載」匯出資料，以後續應用。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者"]}]}, "帳號管理": {"首頁": [{"id": "Capture_帳號管理_0_首頁貌.mp4", "img": "Capture_帳號管理_0_首頁貌.mp4", "tabName": "用戶基本資料與狀態總覽", "desc": "進行帳號管理。可以搜尋、篩選、新增與編輯用戶資訊。", "roles": ["超級管理者", "管理者"]}], "搜尋": [{"id": "Capture_帳號管理_搜尋.mp4", "img": "Capture_帳號管理_搜尋.mp4", "tabName": "搜尋特定帳號", "desc": "透過關鍵字快速搜尋，方便檢視並查詢特定帳號。", "roles": ["超級管理者", "管理者"]}], "單位篩選": [{"id": "Capture_帳號管理_所有單位.mp4", "img": "Capture_帳號管理_所有單位.mp4", "tabName": "篩選相同單位的帳號", "desc": "快速查找特定帳號。透過「單位篩選」尋找目標帳號，並可以結合「勾選」進行批次開通、停用或下載帳號卡。", "roles": ["超級管理者", "管理者"]}], "新增帳號": [{"id": "Capture_帳號管理_新增帳號(單筆).mp4", "img": "Capture_帳號管理_新增帳號(單筆).mp4", "tabName": "新增單筆帳號", "desc": "迅速開通帳號。設定新帳號的權限、單位與姓名，並可選擇設定開通與停用日期。填寫後，點擊「新增帳號」建立。", "roles": ["超級管理者", "管理者"]}, {"id": "Capture_帳號管理_新增帳號(多筆).mp4", "img": "Capture_帳號管理_新增帳號(多筆).mp4", "tabName": "新增多筆帳號", "desc": "可以一次新增多筆帳號，設定其權限、所屬單位及名稱。支援上傳帳號名單，並可彈性設定開通與停用時間。", "roles": ["超級管理者", "管理者"]}], "編輯帳號": [{"id": "Capture_帳號管理_編輯帳號.mp4", "img": "Capture_帳號管理_編輯帳號.mp4", "tabName": "編輯帳號", "desc": "針對錯誤或者需要編輯的帳號做設定。透過「┇」可以編輯帳號權限、單位、開通/停用時間。", "roles": ["超級管理者", "管理者"]}], "忘記密碼": [{"id": "Capture_帳號管理_忘記密碼.mp4", "img": "Capture_帳號管理_忘記密碼.mp4", "tabName": "忘記密碼", "desc": "點選「重置密碼」並「下載帳號卡」給用戶，用戶可憑臨時密碼登入並修改密碼。", "roles": ["超級管理者", "管理者"]}], "勾選": [{"id": "Capture_帳號管理_勾選.mp4", "img": "Capture_帳號管理_勾選.mp4", "tabName": "勾選", "desc": "透過「全選」或「勾選特定資料」進行開通、停用或下載帳號卡。針對已勾選帳號再次點擊，即可取消狀態。", "roles": ["超級管理者", "管理者"]}]}, "物種管理": {"首頁": [{"id": "Capture_物種管理_0_首頁貌.mp4", "img": "Capture_物種管理_0_首頁貌.mp4", "tabName": "總覽與維護", "desc": "檢視並維護所有外來入侵種列表。可搜尋特定物種、新增資料或啟用/停用資料庫狀態。", "roles": ["超級管理者"]}], "搜尋": [{"id": "Capture_物種管理_搜尋.mp4", "img": "Capture_物種管理_搜尋.mp4", "tabName": "搜尋物種資料庫", "desc": "透過關鍵字快速搜尋，方便檢視並查詢物種資料庫。", "roles": ["超級管理者"]}], "啟用/停用": [{"id": "Capture_物種管理_停用.mp4", "img": "Capture_物種管理_停用.mp4", "tabName": "蒐集與顯示資料管理", "desc": "確保平台資料的即時性與準確性。透過「┇」可以編輯物種名稱、啟用/停用資料集。停用資料集後，App 不再蒐集資料、且網頁版監測圖台不顯示資訊。", "roles": ["超級管理者"]}], "新增物種": [{"id": "Capture_物種管理_新增物種.mp4", "img": "Capture_物種管理_新增物種.mp4", "tabName": "系統物種名錄管理", "desc": "維護外來入侵種名錄。點擊右上方「+ 新增物種」按鈕，可新增物種名稱至資料庫。", "roles": ["超級管理者"]}], "資料集": [{"id": "Capture_物種管理_帶入既有資料集.mp4", "img": "Capture_物種管理_帶入既有資料集.mp4", "tabName": "帶入既有資料集", "desc": "迅速複製既有資料集的題目設定。可為新資料集命名、選擇既有物種及欲導入資料集，並設定填寫與管理權限。完成後，點擊「新增」建立。", "roles": ["超級管理者"]}, {"id": "Capture_物種管理_新增資料集.mp4", "img": "Capture_物種管理_新增資料集.mp4", "tabName": "新增資料集", "desc": "建立新物種資料集與權限配置。輸入資料集名稱，完成後，點擊「新增」、並完成新增題目，點擊「啟用」，即可開始蒐集資料。", "roles": ["超級管理者"]}], "題目": [{"id": "Capture_物種管理_新增題目.mp4", "img": "Capture_物種管理_新增題目.mp4", "tabName": "新增題目", "desc": "提供「文字輸入」、「選擇題」、「日期」、「上傳照片」，並支援題目標題、題目提示語、補充說明文字及必選填設定。", "roles": ["超級管理者"]}, {"id": "Capture_物種管理_編輯題目.mp4", "img": "Capture_物種管理_編輯題目.mp4", "tabName": "編輯題目", "desc": "支援編輯題目內容與必選填設定，並可透過「⌃」、「⌄」調整題目順序。", "roles": ["超級管理者"]}, {"id": "Capture_物種管理_封存題目.mp4", "img": "Capture_物種管理_封存題目.mp4", "tabName": "封存題目", "desc": "點選「封存」可於App 隱藏題目並停止資料蒐集；如需恢復，再次點擊即可「解除封存」。", "roles": ["超級管理者"]}]}, "App指南": {"登入": [{"id": "Android_Field Watch田間即時通報_登入教學影片 .mp4", "img": "Android_Field Watch田間即時通報_登入教學影片 .mp4", "tabName": "Android 用戶", "desc": "使用三星(Samsung)、Google、Asus、HTC、小米、OPPO、vivo 等品牌手機用戶，請看這裡。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者", "使用者"]}, {"id": "iPhone_Field Watch田間即時通報_登入教學影片 .mp4", "img": "iPhone_Field Watch田間即時通報_登入教學影片 .mp4", "tabName": "iPhone 用戶", "desc": "使用Apple (蘋果) 手機用戶，請看這裡。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者", "使用者"]}], "忘記密碼": [{"id": "客服諮詢管道.png", "img": "客服諮詢管道.png", "tabName": "忘記密碼", "desc": "請加入Line 客服，並提供您的單位及名稱，我們將協助重新設定您的密碼。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者", "使用者"]}], "下載與客服": [{"id": "客服諮詢管道1.png", "img": "客服諮詢管道1.png", "tabName": "Line 客服 QR Code", "desc": "請掃描QR Code 加入Line 客服開始提問。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者", "使用者"]}, {"id": "F.png", "img": "F.png", "tabName": "App 下載及Line 客服", "desc": "通過掃描QR Code 下載App 或加入Line 客服開始提問。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者", "使用者"]}, {"id": "App 下載.png", "img": "App 下載.png", "tabName": "App 下載 QR Code", "desc": "請掃描QR Code 下載App。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者", "使用者"]}], "教學": [{"id": "B.png", "img": "B.png", "tabName": "App 操作教學", "desc": "提供拍照時的注意事項及逐步教學，可通過掃描下方QR code 觀看教學影片。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者", "使用者"]}, {"id": "操作影片.png", "img": "操作影片.png", "tabName": "影片教學", "desc": "請點擊下方按鍵或掃描操作影片QR code 觀看教學步驟。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者", "使用者"]}], "拍攝注意事項": [{"id": "綠鬣蜥捕捉回報正確拍攝方式與品質不佳照片提醒.pdf", "img": "綠鬣蜥捕捉回報正確拍攝方式與品質不佳照片提醒.pdf", "tabName": "正確拍攝方式", "desc": "提供綠鬣蜥捕捉回報正確拍攝方式與品質不佳照片提醒範例。", "roles": ["超級管理者", "管理者", "資料審核者", "點收者", "使用者"]}]}};
+        const quickGuideData = {"超級管理者": [{"id": "Capture_監測圖台_時間篩選.mp4", "label": "看特定資料"}, {"id": "Capture_監測圖台_CSV下載.mp4", "label": "下載核對資料"}, {"id": "Capture_監測圖台_圖層套疊.mp4", "label": "看地景分布"}, {"id": "Capture_統計圖表_性別組成變化.mp4", "label": "看月匯報"}, {"id": "Capture_調查資料_編輯資料.mp4", "label": "修正資料"}, {"id": "Capture_調查資料_CSV下載.mp4", "label": "需要匯報-CSV"}, {"id": "Capture_調查資料_照片下載.mp4", "label": "需要匯報-照片"}, {"id": "Capture_帳號管理_新增帳號(單筆).mp4", "label": "新增帳號"}, {"id": "Capture_物種管理_新增物種.mp4", "label": "紀錄更多入侵動物"}, {"id": "B.png", "label": "App 教學"}], "管理者": [{"id": "Capture_監測圖台_時間篩選.mp4", "label": "看特定資料"}, {"id": "Capture_監測圖台_CSV下載.mp4", "label": "下載核對資料"}, {"id": "Capture_監測圖台_圖層套疊.mp4", "label": "看地景分布"}, {"id": "Capture_統計圖表_性別組成變化.mp4", "label": "看月匯報"}, {"id": "Capture_調查資料_編輯資料.mp4", "label": "修正資料"}, {"id": "Capture_調查資料_點收.mp4", "label": "點收資料"}, {"id": "Capture_調查資料_CSV下載.mp4", "label": "需要匯報-CSV"}, {"id": "Capture_調查資料_照片下載.mp4", "label": "需要匯報-照片"}, {"id": "Capture_帳號管理_新增帳號(單筆).mp4", "label": "新增帳號"}, {"id": "B.png", "label": "App 教學"}], "資料審核者": [{"id": "Capture_監測圖台_時間篩選.mp4", "label": "看特定資料"}, {"id": "Capture_監測圖台_CSV下載.mp4", "label": "下載核對資料"}, {"id": "Capture_監測圖台_圖層套疊.mp4", "label": "看地景分布"}, {"id": "Capture_統計圖表_性別組成變化.mp4", "label": "看月匯報"}, {"id": "Capture_調查資料_審核.mp4", "label": "審核資料"}, {"id": "Capture_調查資料_CSV下載.mp4", "label": "需要匯報-CSV"}, {"id": "Capture_調查資料_照片下載.mp4", "label": "需要匯報-照片"}, {"id": "B.png", "label": "App 教學"}], "點收者": [{"id": "Capture_監測圖台_時間篩選.mp4", "label": "看特定資料"}, {"id": "Capture_監測圖台_CSV下載.mp4", "label": "下載核對資料"}, {"id": "Capture_監測圖台_圖層套疊.mp4", "label": "看地景分布"}, {"id": "Capture_統計圖表_性別組成變化.mp4", "label": "看月匯報"}, {"id": "Capture_調查資料_點收.mp4", "label": "點收資料"}, {"id": "Capture_調查資料_CSV下載.mp4", "label": "需要匯報-CSV"}, {"id": "Capture_調查資料_照片下載.mp4", "label": "需要匯報-照片"}, {"id": "B.png", "label": "App 教學"}], "使用者": [{"id": "Capture_監測圖台_時間篩選.mp4", "label": "看特定資料"}, {"id": "Capture_監測圖台_CSV下載.mp4", "label": "下載核對資料"}, {"id": "Capture_監測圖台_圖層套疊.mp4", "label": "看地景分布"}, {"id": "B.png", "label": "App 教學"}]};
         let currentRole = "";
 
-        function showIntroPage(pageId) {
-            document.querySelectorAll('#intro-interface .page').forEach(p => {
-                p.classList.remove('active');
-                p.scrollTop = 0; // 切換頁面時自動捲動回最上方
-            });
-            document.getElementById(pageId).classList.add('active');
+        window.addEventListener('DOMContentLoaded', () => {
+            if (!window.location.hash) {
+                history.replaceState(null, null, '#welcome');
+            }
+            handleHash();
+        });
+
+        window.addEventListener('hashchange', handleHash);
+
+        function handleHash() {
+            const hash = window.location.hash.substring(1);
+            const parts = hash.split('/');
+            const route = parts[0];
+
+            if (route === 'welcome' || !route) {
+                _renderIntro('page-welcome');
+            } else if (route === 'roles') {
+                _renderIntro('page-roles');
+            } else if (route === 'guide') {
+                const r = decodeURIComponent(parts[1] || currentRole);
+                if (r) {
+                    _renderGuide(r);
+                } else {
+                    window.location.hash = '#roles';
+                }
+            } else if (route === 'manual') {
+                const id = parts.length > 2 ? decodeURIComponent(parts[2]) : decodeURIComponent(parts[1]);
+                if (id && id !== "undefined") {
+                    _showManualById(id);
+                } else {
+                    enterFullManual();
+                }
+            }
         }
 
-        function selectRole(role) {
+        function _renderIntro(pageId) {
+            document.getElementById('intro-interface').classList.add('active');
+            document.getElementById('manual-interface').classList.remove('active');
+            document.querySelectorAll('#intro-interface .page').forEach(p => {
+                p.classList.remove('active');
+            });
+            const page = document.getElementById(pageId);
+            if(page) {
+                page.classList.add('active');
+                setTimeout(() => page.scrollTop = 0, 10);
+            }
+        }
+
+        function _renderGuide(role) {
             currentRole = role;
             document.getElementById('role-title').innerText = `您好，我是 ${role}`;
             const list = document.getElementById('quick-guide-list');
@@ -239,52 +444,65 @@
                 b.onclick = () => jumpToManual(g.id);
                 list.appendChild(b);
             });
-            showIntroPage('page-guide');
+            _renderIntro('page-guide');
         }
 
-        function enterFullManual() {
+        function _showManualById(id) {
             document.getElementById('intro-interface').classList.remove('active');
             document.getElementById('manual-interface').classList.add('active');
-            renderSidebar(); 
-            const firstGroup = document.querySelector('.group-btn');
-            if(firstGroup) firstGroup.click();
-        }
-
-        function toggleMobileSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('mobile-overlay');
-            sidebar.classList.toggle('active');
-            overlay.classList.toggle('active');
-        }
-
-        function exitManual() {
-            document.getElementById('manual-interface').classList.remove('active');
-            document.getElementById('intro-interface').classList.add('active');
-            showIntroPage('page-guide');
-        }
-
-        function jumpToManual(id) {
-            document.getElementById('intro-interface').classList.remove('active');
-            document.getElementById('manual-interface').classList.add('active');
-            renderSidebar(); 
             
+            _buildSidebar();
+
+            let targetCat = null;
+            let targetGroup = null;
+            let targetItem = null;
+
             for (const cat of Object.keys(nestedData)) {
                 for (const group of Object.keys(nestedData[cat])) {
                     const found = nestedData[cat][group].find(i => i.id === id);
                     if (found) {
-                        const gBtns = document.querySelectorAll('.group-btn');
-                        gBtns.forEach(b => { if(b.innerText === group) b.click(); });
-                        setTimeout(() => {
-                            const tabs = document.querySelectorAll('.tab-item');
-                            tabs.forEach(t => { if(t.getAttribute('data-id') === id) t.click(); });
-                        }, 50);
-                        return;
+                        targetCat = cat;
+                        targetGroup = group;
+                        targetItem = found;
+                        break;
                     }
                 }
+                if (targetCat) break;
+            }
+
+            if (!targetItem) {
+                alert("找不到對應的內容！");
+                exitManual();
+                return;
+            }
+
+            if (!targetItem.roles.includes(currentRole)) {
+                alert("您目前的身分無法查看此內容！請確認您有相應的權限。");
+                exitManual();
+                return;
+            }
+
+            const accBtns = document.querySelectorAll('.acc-btn');
+            let targetPanel = null;
+            accBtns.forEach(acc => {
+                if (acc.innerText.replace(' ▾', '') === targetCat) {
+                    targetPanel = acc.nextElementSibling;
+                    targetPanel.style.display = 'block'; 
+                }
+            });
+
+            if (targetPanel) {
+                const gBtns = targetPanel.querySelectorAll('.group-btn');
+                gBtns.forEach(gb => {
+                    if (gb.innerText === targetGroup) {
+                        const targetItems = nestedData[targetCat][targetGroup].filter(item => item.roles.includes(currentRole));
+                        _renderTabs(targetItems, gb, id);
+                    }
+                });
             }
         }
 
-        function renderSidebar() {
+        function _buildSidebar() {
             const sidebarContent = document.getElementById('sidebar-content');
             sidebarContent.innerHTML = ''; 
             
@@ -292,7 +510,7 @@
                 let catHasItems = false;
                 const acc = document.createElement('button');
                 acc.className = 'acc-btn';
-                acc.innerHTML = cat + " ▾";
+                acc.innerText = cat + " ▾";
                 
                 const panel = document.createElement('div');
                 panel.style.display = 'none';
@@ -301,14 +519,15 @@
 
                 for (const [gName, items] of Object.entries(groups)) {
                     const validItems = items.filter(item => item.roles.includes(currentRole));
+                    
                     if (validItems.length > 0) {
                         catHasItems = true;
                         const gb = document.createElement('button');
                         gb.className = 'group-btn';
                         gb.innerText = gName;
+                        
                         gb.onclick = () => {
-                            panel.style.display = 'block'; 
-                            renderTabs(validItems, gb);
+                            window.location.hash = '#manual/' + encodeURIComponent(validItems[0].id);
                         };
                         panel.appendChild(gb);
                     }
@@ -321,7 +540,7 @@
             }
         }
 
-        function renderTabs(items, btn) {
+        function _renderTabs(items, btn, activeId) {
             document.querySelectorAll('.group-btn').forEach(b => { b.style.color = '#94a3b8'; b.classList.remove('active'); });
             btn.style.color = '#60a5fa';
             btn.classList.add('active');
@@ -330,45 +549,165 @@
             container.innerHTML = '';
             container.style.display = items.length > 1 ? 'flex' : 'none';
 
+            let activeItem = items.find(i => i.id === activeId);
+            if (!activeItem && items.length > 0) activeItem = items[0];
+
             items.forEach(item => {
                 const t = document.createElement('div');
                 t.className = 'tab-item';
                 t.innerText = item.tabName;
                 t.setAttribute('data-id', item.id);
+                if (activeItem && item.id === activeItem.id) t.classList.add('active');
+                
                 t.onclick = () => {
-                    document.querySelectorAll('.tab-item').forEach(x => x.classList.remove('active'));
-                    t.classList.add('active');
-                    document.getElementById('v-title').innerText = item.tabName;
-                    document.getElementById('v-desc').innerText = item.desc;
-                    updateMedia("../" + item.img);
-                    
-                    if(window.innerWidth <= 768 && document.getElementById('sidebar').classList.contains('active')) {
-                        toggleMobileSidebar();
-                    }
+                    window.location.hash = '#manual/' + encodeURIComponent(item.id);
                 };
                 container.appendChild(t);
             });
-            if(items.length > 0) container.firstChild.click();
+
+            if (activeItem) {
+                document.getElementById('v-title').innerText = activeItem.tabName;
+                document.getElementById('v-desc').innerText = activeItem.desc;
+                updateMedia("../" + activeItem.img, activeItem.tabName);
+                
+                if(window.innerWidth <= 768 && document.getElementById('sidebar').classList.contains('active')) {
+                    toggleMobileSidebar();
+                }
+            }
         }
 
-        function updateMedia(file) {
+        function showIntroPage(pageId) {
+            if (pageId === 'page-welcome') window.location.hash = '#welcome';
+            else if (pageId === 'page-roles') window.location.hash = '#roles';
+            else if (pageId === 'page-guide') {
+                if(currentRole) window.location.hash = '#guide/' + encodeURIComponent(currentRole);
+                else window.location.hash = '#roles';
+            }
+        }
+
+        function selectRole(role) {
+            window.location.hash = '#guide/' + encodeURIComponent(role);
+        }
+
+        function enterFullManual() {
+            let firstId;
+            outer: for (const cat of Object.keys(nestedData)) {
+                for (const group of Object.keys(nestedData[cat])) {
+                    const validItems = nestedData[cat][group].filter(item => item.roles.includes(currentRole));
+                    if (validItems.length > 0) {
+                        firstId = validItems[0].id;
+                        break outer;
+                    }
+                }
+            }
+            if (firstId) {
+                window.location.hash = '#manual/' + encodeURIComponent(firstId);
+            }
+        }
+
+        function exitManual() {
+            if (currentRole) {
+                window.location.hash = '#guide/' + encodeURIComponent(currentRole);
+            } else {
+                window.location.hash = '#roles';
+            }
+        }
+
+        function jumpToManual(id) {
+            window.location.hash = '#manual/' + encodeURIComponent(id);
+        }
+
+        function jumpToManualByTitle(targetTitle, targetCat = null) {
+            for (const cat of Object.keys(nestedData)) {
+                if (targetCat && cat !== targetCat) continue; 
+                
+                for (const group of Object.keys(nestedData[cat])) {
+                    const found = nestedData[cat][group].find(i => i.tabName === targetTitle);
+                    if (found) {
+                        if(!found.roles.includes(currentRole)) {
+                            alert("您目前的身分「" + currentRole + "」無法查看此頁面！請聯絡管理員開放權限。");
+                            return;
+                        }
+                        window.location.hash = '#manual/' + encodeURIComponent(found.id);
+                        return;
+                    }
+                }
+            }
+            
+            let alertMsg = "找不到標題為「" + targetTitle + "」";
+            if (targetCat) alertMsg += " 且分類為「" + targetCat + "」";
+            alertMsg += " 的教學內容！請確認 Excel 裡的標題名稱是否完全一致。";
+            alert(alertMsg);
+        }
+
+        function toggleMobileSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('mobile-overlay');
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+        }
+
+        function closePdfModal() {
+            document.getElementById('pdf-modal').style.display = 'none';
+            document.getElementById('pdf-iframe').src = '';
+        }
+
+        // 動態判斷並渲染不同檔案類型
+        function updateMedia(file, titleStr) {
             const img = document.getElementById('display-img');
             const video = document.getElementById('display-video');
+            const pdfActions = document.getElementById('display-pdf-actions');
+            const ytActions = document.getElementById('youtube-actions'); // 取得 YouTube 按鈕區塊
             
             img.style.display = 'none';
             video.style.display = 'none';
+            pdfActions.style.display = 'none';
+            ytActions.style.display = 'none'; // 預設隱藏
             video.pause();
 
-            if (file.toLowerCase().endsWith('.mp4') || file.toLowerCase().endsWith('.webm')) {
+            // 若目前標題包含「影片教學」，則顯示 YouTube 按鈕
+            if (titleStr && titleStr.includes('影片教學')) {
+                ytActions.style.display = 'flex';
+            }
+
+            if (!file) return;
+
+            const ext = file.split('.').pop().toLowerCase();
+
+            if (ext === 'mp4' || ext === 'webm') {
                 video.src = file;
                 video.style.display = 'block'; 
                 video.play();
+            } else if (ext === 'pdf') {
+                // 顯示精緻版的卡片按鈕
+                pdfActions.style.display = 'flex';
+                
+                // 設定下載行為 (外層按鈕與 Modal 內建按鈕都綁定)
+                const downloadFn = () => {
+                    const a = document.createElement('a');
+                    a.href = file;
+                    a.download = file.split('/').pop(); // 自動取檔名
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                };
+
+                document.getElementById('pdf-download-btn').onclick = downloadFn;
+                document.getElementById('modal-inner-dl-btn').onclick = downloadFn;
+                
+                // 設定標題列顯示的 PDF 名稱
+                document.getElementById('pdf-modal-title').innerText = titleStr || "PDF 預覽";
+
+                // 綁定線上瀏覽按鈕
+                document.getElementById('pdf-view-btn').onclick = () => {
+                    document.getElementById('pdf-iframe').src = file + '#toolbar=1&navpanes=0&scrollbar=1';
+                    document.getElementById('pdf-modal').style.display = 'flex';
+                };
             } else {
                 img.src = file;
                 img.style.display = 'block'; 
             }
             
-            // 💡 點擊切換時，自動將畫面捲動回上方
             document.getElementById('main-content').scrollTop = 0;
         }
     </script>
